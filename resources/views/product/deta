@@ -1,0 +1,141 @@
+
+<div class="container product-details-container" style="margin-top: 30px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="product-image-container" style="display: flex; justify-content: center; align-items: center; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 20px;">
+                @if($product->image_path)
+                <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" class="product-image" style="max-width: 100%; height: auto; display: block; border-radius: 8px;">
+                @else
+                <p>No image</p>
+                @endif
+            </div>
+        </div>
+        <div class="col-md-6 product-info" style="padding: 20px;">
+            <h1 class="product-title" style="font-size: 2.5rem; margin-bottom: 10px; font-weight: 500; color: #343a40;">{{ $product->name }}</h1>
+            <p class="product-category" style="margin-bottom: 15px; font-style: italic; color: #777;">Category: {{ $product->category->name ?? 'N/A' }}</p>
+            <div class="product-description" style="line-height: 1.7; margin-bottom: 25px; color: #444;">
+                {{ $product->description }}
+            </div>
+            <p class="product-price" style="font-size: 2rem; font-weight: bold; color: #28a745; margin-bottom: 20px;">
+                ${{ $product->price }}
+            </p>
+            <div class="product-actions" style="margin-top: 25px;">
+                <button class="btn btn-success checkout-btn" style="border-radius: 4px; padding: 10px 20px; white-space: nowrap; transition: background-color 0.3s ease; background-color: #28a745; border-color: #28a745;" data-bs-toggle="modal" data-bs-target="#checkoutModal">
+                     Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+    <a href="/" class="btn btn-secondary back-button" style="margin-top: 30px;">Back to Products</a>
+
+    <h2 class="related-products-header" style="margin-top: 40px; margin-bottom: 20px; font-size: 1.5rem; font-weight: 500; color: #343a40;">Related Products</h2>
+    <div class="related-products-container" style="padding: 15px; display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px;">
+        <div class="card" style="width: 200px; min-width: 200px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);">
+            <img src="https://via.placeholder.com/200" alt="Related Product 1" class="card-img-top" style="max-width: 100%; height: auto; display: block; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <div class="card-body" style="padding: 10px;">
+                <h5 class="card-title" style="font-size: 1rem; font-weight: 500; margin-bottom: 5px;">Related Product 1</h5>
+                <p class="card-price" style="font-size: 1rem; font-weight: bold; color: #28a745;">$19.99</p>
+            </div>
+        </div>
+        <div class="card" style="width: 200px; min-width: 200px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);">
+            <img src="https://via.placeholder.com/200" alt="Related Product 2" class="card-img-top" style="max-width: 100%; height: auto; display: block; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <div class="card-body" style="padding: 10px;">
+                <h5 class="card-title" style="font-size: 1rem; font-weight: 500; margin-bottom: 5px;">Related Product 2</h5>
+                <p class="card-price" style="font-size: 1rem; font-weight: bold; color: #28a745;">$29.99</p>
+            </div>
+        </div>
+        <div class="card" style="width: 200px; min-width: 200px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);">
+            <img src="https://via.placeholder.com/200" alt="Related Product 3" class="card-img-top" style="max-width: 100%; height: auto; display: block; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <div class="card-body" style="padding: 10px;">
+                <h5 class="card-title" style="font-size: 1rem; font-weight: 500; margin-bottom: 5px;">Related Product 3</h5>
+                <p class="card-price" style="font-size: 1rem; font-weight: bold; color: #28a745;">$39.99</p>
+            </div>
+        </div>
+        <div class="card" style="width: 200px; min-width: 200px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);">
+            <img src="https://via.placeholder.com/200" alt="Related Product 4" class="card-img-top" style="max-width: 100%; height: auto; display: block; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <div class="card-body" style="padding: 10px;">
+                <h5 class="card-title" style="font-size: 1rem; font-weight: 500; margin-bottom: 5px;">Related Product 4</h5>
+                <p class="card-price" style="font-size: 1rem; font-weight: bold; color: #28a745;">$49.99</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel">Product Inquiry</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form id="productInquiryForm">
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                 <input type="text" class="form-control" id="name" name="name" required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div class="mb-3">
+                  <label for="phone" class="form-label">Phone</label>
+                <input type="tel" class="form-control" id="phone" name="phone">
+              </div>
+                <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+              </div>
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+         </form>
+         <div id="formResponse" style="display: none; margin-top: 10px;" class="alert"></div>
+
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="submitInquiry">Submit Inquiry</button>
+       </div>
+     </div>
+   </div>
+</div>
+
+@include('layout.footer')
+
+<script>
+    document.getElementById('submitInquiry').addEventListener('click', function() {
+        const form = document.getElementById('productInquiryForm');
+        const formData = new FormData(form);
+          const formResponseDiv = document.getElementById('formResponse');
+
+         fetch('{{ route('product.inquiry') }}', {
+            method: 'POST',
+            headers: {
+                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: formData,
+        })
+         .then(response => {
+            if (response.ok) {
+                  return response.json();
+             }
+              throw new Error('Network response was not ok.');
+        })
+          .then(data => {
+               formResponseDiv.textContent = data.message;
+                formResponseDiv.classList.add('alert-success');
+               formResponseDiv.style.display = 'block';
+               form.reset()
+            setTimeout(() => {
+              formResponseDiv.style.display = 'none';
+              $('#checkoutModal').modal('hide');
+             }, 2000);
+           })
+            .catch(error => {
+            formResponseDiv.textContent = 'There was a problem submitting the form: ' + error.message;
+            formResponseDiv.classList.add('alert-danger');
+            formResponseDiv.style.display = 'block';
+           });
+
+    });
+</script>
