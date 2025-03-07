@@ -31,7 +31,7 @@
                                 <thead>
                                     <tr>
                                         <th class="product_remove">Delete</th>
-                                        <th class="product_thumb">Image</th>
+                                        <th class="product_thumb1">Image</th>
                                         <th class="product_name">Product</th>
                                         <th class="product-price">Price</th>
                                         <th class="product_quantity">Stock Status</th>

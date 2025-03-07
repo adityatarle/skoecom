@@ -226,6 +226,66 @@
 
   </div>
 
+  <script>
+    $(document).ready(function() {
+        // Add to Cart
+        $(".add_to_cart1").click(function(e) {
+            e.preventDefault();
+            var productId = $(this).data("id");
+
+            $.ajax({
+                url: "{{ route('cart.add') }}",
+                type: "POST",
+                data: {
+                    product_id: productId,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    if (response.status === "success") {
+                        alert(response.message);
+                        $("#cart_count").text(response.cart_count);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText); // Log the error to the console
+                    alert("Error adding to cart");
+                }
+            });
+        });
+
+        // Add to Wishlist
+        $(".add_to_wishlist").click(function(e) {
+            e.preventDefault();
+            var productId = $(this).data("id");
+
+            $.ajax({
+                url: "{{ route('wishlist.add') }}",
+                type: "POST",
+                data: {
+                    product_id: productId
+                },
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                }, // CSRF Token
+                success: function(response) {
+                    if (response.status === "success" || response.status === "info") {
+                        alert(response.message);
+                        $("#wishlist_count").text(response.wishlist_count); // Update count
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("Error adding to wishlist");
+                }
+            });
+        });
+    });
+</script>
+
   <!-- JS
 ============================================ -->
 

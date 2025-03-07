@@ -46,6 +46,74 @@
         });
     </script>
 
+    <style>
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .navbar-links {
+                flex-direction: column;
+                /* Stack navigation items vertically */
+                display: none;
+                /* Hide by default */
+                width: 100%;
+                /* Make links full width */
+            }
+
+            .navbar-links.show {
+                display: flex;
+                /* Show when toggled */
+            }
+
+            .navbar-links a {
+                padding: 10px;
+                text-align: left;
+                /* Ensure text is left-aligned */
+                border-bottom: 1px solid #eee;
+                /* Add a border between links */
+            }
+
+            .dropdown-content {
+                position: static;
+                /* Display dropdown inline */
+                display: none;
+                /* Hide by default */
+                background-color: #f9f9f9;
+                padding: 0;
+                box-shadow: none;
+                z-index: 1;
+                width: 100%;
+            }
+
+            .dropdown-content a {
+                padding: 10px;
+                display: block;
+                border-bottom: 1px solid #eee;
+            }
+
+            .dropdown-content.show {
+                display: block;
+                /* Show when toggled */
+            }
+
+            .dropdown-arrow {
+                color: #000000;
+            }
+        }
+
+
+        .navbar .navbar-links .dropdown>a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* Distribute content evenly */
+        }
+
+        .navbar .navbar-links .dropdown .dropdown-arrow {
+            margin-left: auto;
+            /* Push arrow to the right */
+            display: inline-block;
+            /* Ensure the arrow is visible */
+        }
+    </style>
 </head>
 
 
@@ -92,17 +160,22 @@
                     <a href="#">
                         <i class="fas fa-headphones d-none d-lg-block"></i>
                     </a>
-                    <a href="#">
-                        <i class="fas fa-search d-none d-lg-block"></i>
-                    </a>
-                    <a href="#">
+
+                    <a href="{{ route('wishlist.index') }}">
                         <i class="fa-regular fa-heart">
-                            <span class="badge">0</span>
+                            <span class="badge" id="wishlist_count">
+                                <!-- {{Auth::id()}} -->
+                                @auth
+                                {{ \App\Models\Wishlist::where('user_id', Auth::id())->count() }}
+                                @else
+                                {{ count(session('wishlist', [])) }}
+                                @endauth
+                            </span>
                         </i>
                     </a>
-                    <a href="#">
+                    <a href="{{ route('cart.index') }}">
                         <i class="fa-solid fa-cart-shopping">
-                            <span class="badge">0</span>
+                            <span class="badge" id="cart_count">{{ count(session('cart', [])) }}</span>
                         </i>
                     </a>
                     <a href="#">
@@ -113,82 +186,50 @@
 
             <nav class="navbar">
                 <div class="navbar-links">
+                    @foreach($categories as $category)
                     <div class="dropdown">
-                        <a href="#">All Jewellery <span class="dropdown-arrow">▾</span></a>
-                        <div class="dropdown-content">
-                            <a href="#">Gold Jewellery</a>
-                            <a href="#">Temple Gold Jewellery</a>
-                            <a href="#">Diamond Jewellery</a>
-                            <a href="#">Nuvo Polki / Jadau Jewellery</a>
-                            <a href="#">Silver Jewellery</a>
-                            <a href="#">Desert Rose</a>
-                            <a href="#">Available In Store</a>
-                            <a href="#">Best Sellers</a>
-                        </div>
-                    </div>
-                    <a href="#">New Arrivals</a>
+                        <a href="{{ route('category.show', $category->id) }}">
+                            {{ $category->name }}
+                            @if($category->subcategories->count() > 0)
+                            <span class="dropdown-arrow">▾</span>
+                            @endif
+                        </a>
 
-                    <div class="dropdown">
-                        <a href="#">Choker / Necklace <span class="dropdown-arrow">▾</span></a>
+                        @if($category->subcategories->count() > 0)
                         <div class="dropdown-content">
-                            <a href="#">Choker</a>
-                            <a href="#">Necklace / Long Necklace</a>
-                            <a href="#">Earrings / Chandbali / Jhumka</a>
-                            <a href="#">Bangles / Bracelets</a>
-                            <a href="#">Necklace And Earring Set</a>
-                            <a href="#">Rings</a>
-                            <a href="#">Maang Tikka</a>
-                            <a href="#">Pendants</a>
-                            <a href="#">Hand Phool</a>
-                            <a href="#">Anklet</a>
+                            @foreach($category->subcategories as $subcategory)
+                            <a href="#">{{ $subcategory->name }}</a> <br>
+                            @endforeach
                         </div>
+                        @endif
                     </div>
-
-                    <div class="dropdown">
-                        <a href="#">Earrings <span class="dropdown-arrow">▾</span></a>
-                        <div class="dropdown-content">
-                            <a href="#">Stud Earrings</a>
-                            <a href="#">Drop Earrings</a>
-                            <a href="#">Hoop Earrings</a>
-                            <a href="#">Jhumkas</a>
-                            <a href="#">Chandbali Earrings</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="#">Bangles <span class="dropdown-arrow">▾</span></a>
-                        <div class="dropdown-content">
-                            <a href="#">Gold Bangles</a>
-                            <a href="#">Silver Bangles</a>
-                            <a href="#">Diamond Bangles</a>
-                            <a href="#">Kada Bangles</a>
-                            <a href="#">Enamel Bangles</a>
-                        </div>
-                    </div>
-
-                    <div class="dropdown">
-                        <a href="#">Rings <span class="dropdown-arrow">▾</span></a>
-                        <div class="dropdown-content">
-                            <a href="#">Engagement Rings</a>
-                            <a href="#">Wedding Bands</a>
-                            <a href="#">Fashion Rings</a>
-                            <a href="#">Statement Rings</a>
-                            <a href="#">Cocktail Rings</a>
-                        </div>
-                    </div>
-
-                    <a href="#">High Jewellery</a>
+                    @endforeach
                 </div>
             </nav>
 
 
 
             <script>
-                const navbarToggle = document.querySelector('.navbar-toggle');
-                const navbarLinks = document.querySelector('.navbar-links');
+                $(document).ready(function() {
+                    // Toggle main menu
+                    $(".navbar-toggle").click(function() {
+                        $(".navbar-links").toggleClass("show");
+                    });
 
-                navbarToggle.addEventListener('click', () => {
-                    navbarLinks.classList.toggle('show');
+                    // Toggle dropdowns
+                    $(".dropdown > a").click(function(e) {
+                        e.preventDefault(); // Prevent default link behavior
+                        $(this).parent().toggleClass("show"); // Toggle class on parent dropdown
+                        $(this).next(".dropdown-content").slideToggle(); // Toggle dropdown content visibility
+                    });
+
+                    // Close dropdown when clicking outside
+                    $(document).click(function(e) {
+                        if (!$(e.target).closest('.dropdown').length) {
+                            $(".dropdown").removeClass("show");
+                            $(".dropdown-content").slideUp();
+                        }
+                    });
                 });
             </script>
         </header>

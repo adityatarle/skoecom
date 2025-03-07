@@ -31,6 +31,9 @@ Route::delete('/wishlist/remove/{productId}', [WishlistController::class, 'remov
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 Route::get('/wishlist/count', [WishlistController::class, 'getWishlistCount']);
 
+Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+
+
 
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');

@@ -75,7 +75,7 @@
 
                         <div class="pb-4">
                             <p class="fw-bold mb-0">Product Description:</p>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse aut blanditiis quidem voluptatem aperiam nesciunt, sapiente iste mollitia sequi sunt quisquam omnis praesentium ab deleniti, repellat ratione nobis laboriosam modi molestias ex assumenda. Quia harum voluptatem vel mollitia. A vitae, corrupti quas fugit illum quibusdam reprehenderit qui inventore reiciendis minus!</p>
+                            <p>{!! $product->description !!}</p>
                         </div>
 
                         <!-- Bootstrap Accordion -->
