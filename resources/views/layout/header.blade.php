@@ -178,7 +178,7 @@
                             <span class="badge" id="cart_count">{{ count(session('cart', [])) }}</span>
                         </i>
                     </a>
-                    <a href="#">
+                    <a href="{{ route('profile.show') }}">
                         <i class="fas fa-user d-none d-lg-block"></i>
                     </a>
                 </div>
