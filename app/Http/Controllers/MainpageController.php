@@ -6,11 +6,19 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ProductCategory;
+use App\Models\Subcategory;
 use Illuminate\Support\Str;
-
 
 class MainpageController extends Controller
 {
+
+    public function header()
+    {
+        $categories = ProductCategory::with('subcategories')->get();
+        return view('layout.header', compact('categories'));
+    }
+
+
     public function index(Request $request)
     {
         // Fetch all products
@@ -106,29 +114,41 @@ class MainpageController extends Controller
     }
 
 
+
+
+
     public function products(Request $request)
     {
-       // dd($request->all());
-       $category = $request->input('category');
-       $min_price = $request->input('min_price');
-       $max_price = $request->input('max_price');
+        $category = $request->input('category');
+        $subcategory = $request->input('subcategory');
+        $min_price = $request->input('min_price');
+        $max_price = $request->input('max_price');
 
-      $products = Product::when($category && $category != 'all', function ($query) use ($category) {
-                $query->whereHas('category', function ($q) use ($category) {
-                   $q->where('name', $category);
-                 });
-                  })
-                 ->when($min_price !== null && $max_price !== null, function ($query) use ($min_price, $max_price) {
-                 $query->where('price', '>=', $min_price)
-                  ->where('price', '<=', $max_price);
-               })
-              ->get();
-      // fetch products by category in the top of file or every action will be affected
+        $products = Product::when($category && $category != 'all', function ($query) use ($category) {
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
+            });
+        })
+            ->when($subcategory, function ($query) use ($subcategory) {
+                $query->whereHas('subcategory', function ($q) use ($subcategory) {
+                    $q->where('name', $subcategory);
+                });
+            })
+            ->when($min_price !== null && $max_price !== null, function ($query) use ($min_price, $max_price) {
+                $query->where('price', '>=', $min_price)
+                    ->where('price', '<=', $max_price);
+            })
+            ->get();
 
-              $categories = ProductCategory::all();
-            return view('products', [
-           'products' => $products,
-           'categories' => $categories,
-             ]);
+        $categories = ProductCategory::all();
+
+        if ($request->ajax()) {
+            return view('partials.product_grid', ['products' => $products])->render();
+        }
+
+        return view('products', [
+            'products' => $products,
+            'categories' => $categories,
+        ]);
     }
 }

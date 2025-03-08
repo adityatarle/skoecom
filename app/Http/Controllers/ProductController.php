@@ -12,11 +12,7 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
 
-    public function header()
-{
-    $categories = ProductCategory::with('subcategories')->get();
-    return view('layout.header', compact('categories'));
-}
+    
 
     public function index()
     {

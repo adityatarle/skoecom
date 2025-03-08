@@ -33,6 +33,9 @@ Route::get('/wishlist/count', [WishlistController::class, 'getWishlistCount']);
 
 Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
 
+Route::get('/filter-products', [MainpageController::class, 'filterProducts'])->name('filter.products');
+
+
 
 
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');

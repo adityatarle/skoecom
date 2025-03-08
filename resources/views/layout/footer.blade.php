@@ -11,12 +11,12 @@
                               <p>Phone: <a href="tel:0123456789">0123456789</a></p>
                               <p>Email: demo@example.com</p>
                               <ul>
-                                  <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                  <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                  <li><a href="#"><i class="ion-social-rss"></i></a></li>
+                                  <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
+                                  <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
+                                  <li><a href="#"><i class="fa fa-instagram"></i></a></li>
                                   <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
 
-                                  <li><a href="#"><i class="ion-social-youtube"></i></a></li>
+                                  <li><a href="#"><i class="fas fa-youtube"></i></a></li>
                               </ul>
 
                           </div>
@@ -206,10 +206,10 @@
                                   <div class="modal_social">
                                       <h2>Share this product</h2>
                                       <ul>
-                                          <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                          <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                          <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
+                                          <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
                                           <li><a href="#"><i class="fa fa-pinterest"></i></a></li>
-                                          <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+                                          <li><a href="#"><i class="ion-social-googleplus"></i></a></li>
                                           <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
                                       </ul>
                                   </div>

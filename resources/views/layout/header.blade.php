@@ -137,11 +137,11 @@
                 <button class="navbar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a href="" class="logo">
+                <a href="{{ route('home') }}" class="logo">
                     <img src="{{ asset('assets/img/logo/logo.png') }}" alt="Jaipur Gems" class="logo">
                 </a>
 
-                <a href="#" class="mobile-logo">
+                <a href="{{ route('home') }}" class="mobile-logo">
                     <img src="{{ asset('assets/img/logo/logo.png') }}" alt="Jaipur Gems" class="mobile-logo">
                 </a>
 
@@ -188,7 +188,7 @@
                 <div class="navbar-links">
                     @foreach($categories as $category)
                     <div class="dropdown">
-                        <a href="{{ route('category.show', $category->id) }}">
+                        <a href="{{ route('products', ['category' => $category->name]) }}">
                             {{ $category->name }}
                             @if($category->subcategories->count() > 0)
                             <span class="dropdown-arrow">▾</span>
@@ -198,7 +198,7 @@
                         @if($category->subcategories->count() > 0)
                         <div class="dropdown-content">
                             @foreach($category->subcategories as $subcategory)
-                            <a href="#">{{ $subcategory->name }}</a> <br>
+                            <a href="{{ route('products', ['subcategory' => $subcategory->name]) }}">{{ $subcategory->name }}</a> <br>
                             @endforeach
                         </div>
                         @endif

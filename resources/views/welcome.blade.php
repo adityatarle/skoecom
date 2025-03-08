@@ -2,7 +2,7 @@
 
 <!--slider area start-->
 <div class="slider_area home_slider_three owl-carousel">
-    <div class="single_slider" data-bgimg="assets/img/slider/slider6.jpg">
+    <div class="single_slider" data-bgimg="assets/img/slider/banner.jpg">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12">
