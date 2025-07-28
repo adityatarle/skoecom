@@ -41,71 +41,92 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Cart total must be at least ₹1.00 to proceed.');
         }
 
+        // Initialize Razorpay order variable
+        $razorpayOrder = null;
+        
         // Check Razorpay configuration
         $razorpayKey = env('RAZORPAY_KEY');
         $razorpaySecret = env('RAZORPAY_SECRET');
         
+        // Debug logging
+        Log::info('Razorpay Configuration Check:', [
+            'key_exists' => !empty($razorpayKey),
+            'secret_exists' => !empty($razorpaySecret),
+            'key_value' => $razorpayKey,
+            'secret_value' => substr($razorpaySecret ?? '', 0, 10) . '...',
+            'is_placeholder_key' => $razorpayKey === 'rzp_test_your_key_here',
+            'is_placeholder_secret' => $razorpaySecret === 'your_secret_here',
+            'app_debug' => env('APP_DEBUG')
+        ]);
+        
         if (empty($razorpayKey) || empty($razorpaySecret) || 
             $razorpayKey === 'rzp_test_your_key_here' || 
             $razorpaySecret === 'your_secret_here') {
-            Log::error('Razorpay keys not configured properly');
+            Log::warning('Razorpay keys not configured properly - using demo mode');
             
             // Development mode: Create a dummy order for testing
             if (env('APP_DEBUG', false)) {
                 $razorpayOrder = [
                     'id' => 'order_demo_' . time(),
-                    'amount' => $cartTotal * 100,
+                    'amount' => (int)($cartTotal * 100),
                     'currency' => 'INR',
-                    'receipt' => 'DEMO_' . uniqid()
+                    'receipt' => 'DEMO_' . uniqid(),
+                    'status' => 'created'
                 ];
-                Log::info('Using demo Razorpay order for development');
+                Log::info('Using demo Razorpay order for development', ['order_id' => $razorpayOrder['id']]);
                 session(['razorpay_order_id' => $razorpayOrder['id']]);
             } else {
                 return redirect()->route('cart.index')->with('error', 'Payment gateway not configured. Please contact administrator.');
             }
         } else {
+            // Initialize Razorpay API with real keys
+            try {
+                $api = new Api($razorpayKey, $razorpaySecret);
+                
+                // Prepare Razorpay order data
+                $razorpayOrderData = [
+                    'receipt'         => 'ORD_' . uniqid() . '_' . time(),
+                    'amount'          => (int)($cartTotal * 100),
+                    'currency'        => 'INR',
+                    'payment_capture' => 1
+                ];
 
-        // Initialize Razorpay API
-        try {
-            $api = new Api($razorpayKey, $razorpaySecret);
-        } catch (\Exception $e) {
-            Log::error('Failed to initialize Razorpay API:', ['message' => $e->getMessage()]);
-            return redirect()->route('cart.index')->with('error', 'Failed to initialize payment gateway. Please contact support.');
+                Log::info('Attempting to create Razorpay order with data:', $razorpayOrderData);
+
+                // Create Razorpay order
+                $razorpayOrder = $api->order->create($razorpayOrderData);
+                Log::info('Razorpay order created successfully:', ['order_id' => $razorpayOrder['id']]);
+                session(['razorpay_order_id' => $razorpayOrder['id']]);
+
+            } catch (BadRequestError $e) {
+                Log::error('Razorpay API Bad Request Error:', [
+                    'message' => $e->getMessage(), 
+                    'field' => $e->getField(), 
+                    'code' => $e->getCode(),
+                    'order_data' => $razorpayOrderData ?? null,
+                    'api_key' => substr($razorpayKey, 0, 10) . '...'
+                ]);
+                return redirect()->route('cart.index')->with('error', 'Failed to initialize payment gateway. Please check your cart or try again later.');
+            } catch (\Exception $e) {
+                Log::error('General Error creating Razorpay order:', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'order_data' => $razorpayOrderData ?? null
+                ]);
+                return redirect()->route('cart.index')->with('error', 'An unexpected error occurred while preparing your order. Please try again.');
+            }
         }
 
-        // Prepare Razorpay order data
-        $razorpayOrderData = [
-            'receipt'         => 'ORD_' . uniqid() . '_' . time(), // Generate a unique receipt ID
-            'amount'          => (int)($cartTotal * 100), // Amount in paise, ensure integer
-            'currency'        => 'INR',
-            'payment_capture' => 1 // Auto-capture payment
-        ];
-
-        Log::info('Attempting to create Razorpay order with data:', $razorpayOrderData);
-
-        // Create Razorpay order
-        try {
-            $razorpayOrder = $api->order->create($razorpayOrderData);
-            Log::info('Razorpay order created successfully:', ['order_id' => $razorpayOrder['id']]);
-            session(['razorpay_order_id' => $razorpayOrder['id']]); // Store Razorpay order ID in session
-
-        } catch (BadRequestError $e) {
-            Log::error('Razorpay API Bad Request Error (Order Creation):', [
-                'message' => $e->getMessage(), 
-                'field' => $e->getField(), 
-                'code' => $e->getCode(),
-                'order_data' => $razorpayOrderData,
-                'api_key' => substr($razorpayKey, 0, 10) . '...' // Log partial key for debugging
-            ]);
-            return redirect()->route('cart.index')->with('error', 'Failed to initialize payment gateway. Please check your cart or try again later.');
-        } catch (\Exception $e) {
-            Log::error('General Error creating Razorpay order:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'order_data' => $razorpayOrderData
-            ]);
-            return redirect()->route('cart.index')->with('error', 'An unexpected error occurred while preparing your order. Please try again.');
-        }
+        // Ensure razorpayOrder is not null for the view
+        if ($razorpayOrder === null) {
+            Log::error('RazorpayOrder is null after processing - creating fallback');
+            $razorpayOrder = [
+                'id' => 'order_fallback_' . time(),
+                'amount' => (int)($cartTotal * 100),
+                'currency' => 'INR',
+                'receipt' => 'FALLBACK_' . uniqid(),
+                'status' => 'created'
+            ];
         }
 
         // Pass necessary data to the checkout view
