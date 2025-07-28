@@ -58,6 +58,7 @@ Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('
 // Payment Routes
 Route::get('/razorpay-create-order', [RazorpayController::class, 'createOrder'])->name('razorpay.createOrder');
 Route::post('/payment-success', [RazorpayController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/test-razorpay', [RazorpayController::class, 'testConfig'])->name('razorpay.test');
 
 // Order Routes (Requires authentication for viewing orders)
 Route::middleware(['auth'])->group(function () {
