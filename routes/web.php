@@ -32,10 +32,12 @@ Route::get('/filter-products', [MainpageController::class, 'filterProducts'])->n
 // Cart Routes (Work for both guest and authenticated users)
 Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add');
 Route::get('/cart', [CartController::class, 'cart'])->name('cart.index');
-Route::get('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-Route::get('/cart/increase/{id}', [CartController::class, 'increaseQuantity'])->name('cart.increase');
-Route::get('/cart/decrease/{id}', [CartController::class, 'decreaseQuantity'])->name('cart.decrease');
+Route::delete('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
+Route::patch('/cart/increase/{id}', [CartController::class, 'increaseQuantity'])->name('cart.increase');
+Route::patch('/cart/decrease/{id}', [CartController::class, 'decreaseQuantity'])->name('cart.decrease');
+Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+Route::post('/cart/clear', [CartController::class, 'clearCart'])->name('cart.clear');
 
 // Wishlist Routes (Work for both guest and authenticated users)
 Route::post('/wishlist/add', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
@@ -64,6 +66,7 @@ Route::get('/test-razorpay', [RazorpayController::class, 'testConfig'])->name('r
 Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [CheckoutController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [CheckoutController::class, 'showOrder'])->name('orders.show');
+    Route::post('/orders/{order}/reorder', [CheckoutController::class, 'reorder'])->name('orders.reorder');
     
     // Customer Profile Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

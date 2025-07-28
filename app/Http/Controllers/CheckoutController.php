@@ -3,68 +3,258 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order; // Make sure your Order model namespace is correct
-use App\Models\User;  // Assuming you have a User model
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
 use Razorpay\Api\Errors\BadRequestError;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException; // Add this use statement
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 
 class CheckoutController extends Controller
 {
     /**
-     * Display the checkout page.
-     * Creates a Razorpay order ID beforehand.
+     * Display the checkout page with improved cart validation and Razorpay setup
      */
     public function checkout()
     {
-        $cart = session('cart', []);
+        try {
+            $cart = session('cart', []);
 
-        // Log cart data on checkout page load
-        Log::info('Checkout Page Load - Session Data:', ['cart' => $cart, 'cart_total' => session('cart_total')]);
+            // Validate cart exists and has items
+            if (empty($cart)) {
+                Log::warning('Checkout attempted with empty cart.');
+                return redirect()->route('cart.index')
+                    ->with('error', 'Your cart is empty. Please add items before proceeding to checkout.');
+            }
 
-        if (empty($cart)) {
-            Log::warning('Checkout attempted with empty cart.');
-            return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add items before proceeding to checkout.');
+            // Calculate cart total from the current cart session
+            $cartTotal = $this->calculateCartTotal($cart);
+
+            // Validate minimum order amount
+            if ($cartTotal < 1) {
+                Log::warning('Checkout attempted with invalid cart total:', ['total' => $cartTotal]);
+                return redirect()->route('cart.index')
+                    ->with('error', 'Cart total must be at least ₹1.00 to proceed.');
+            }
+
+            // Store cart total in session for order processing
+            session(['cart_total' => $cartTotal]);
+
+            // Initialize Razorpay order
+            $razorpayOrder = $this->createRazorpayOrder($cartTotal);
+
+            if (!$razorpayOrder) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Payment gateway initialization failed. Please try again.');
+            }
+
+            return view('checkout', compact('cart', 'cartTotal', 'razorpayOrder'));
+
+        } catch (\Exception $e) {
+            Log::error('Checkout page error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('cart.index')
+                ->with('error', 'An error occurred while loading the checkout page. Please try again.');
+        }
+    }
+
+    /**
+     * Process the order placement with improved validation and error handling
+     */
+    public function placeOrder(Request $request)
+    {
+        Log::info('=== Place Order Started ===', [
+            'user_id' => Auth::id(),
+            'payment_method' => $request->payment_method
+        ]);
+
+        try {
+            // Validate cart exists before processing
+            $cart = session('cart', []);
+            if (empty($cart)) {
+                Log::error('Place order attempted with empty cart');
+                return redirect()->route('cart.index')
+                    ->with('error', 'Your cart is empty. Please add items before placing an order.');
+            }
+
+            // Create cart backup for recovery if needed
+            session(['cart_backup' => $cart]);
+
+            // Validate the request
+            $validatedData = $this->validateOrderRequest($request);
+
+            // Verify payment if Razorpay
+            if ($validatedData['payment_method'] === 'razorpay') {
+                $paymentVerified = $this->verifyRazorpayPayment($validatedData);
+                if (!$paymentVerified) {
+                    $this->restoreCart();
+                    return redirect()->route('checkout')
+                        ->with('error', 'Payment verification failed. Please try again.');
+                }
+            }
+
+            // Calculate final order total
+            $orderTotal = $this->calculateCartTotal($cart);
+            if ($orderTotal <= 0) {
+                Log::error('Invalid order total calculated', ['total' => $orderTotal]);
+                $this->restoreCart();
+                return redirect()->route('checkout')
+                    ->with('error', 'Invalid order total. Please refresh and try again.');
+            }
+
+            // Create the order
+            $order = $this->createOrder($validatedData, $cart, $orderTotal);
+
+            if (!$order) {
+                $this->restoreCart();
+                return redirect()->route('checkout')
+                    ->with('error', 'Failed to create order. Please try again.');
+            }
+
+            // Clear cart and related session data
+            $this->clearCheckoutSession();
+
+            Log::info('Order created successfully', ['order_id' => $order->id]);
+
+            return redirect()->route('orders.show', $order->id)
+                ->with('success', 'Your order has been placed successfully!');
+
+        } catch (ValidationException $e) {
+            Log::error('Order validation failed', ['errors' => $e->errors()]);
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+                
+        } catch (\Exception $e) {
+            Log::error('Place order error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            $this->restoreCart();
+            return redirect()->route('checkout')
+                ->with('error', 'An error occurred while processing your order. Please try again.');
+        }
+    }
+
+    /**
+     * Display a specific order
+     */
+    public function showOrder($orderId)
+    {
+        try {
+            $query = Order::query();
+            
+            // Restrict access for logged-in users to their own orders
+            if (Auth::check()) {
+                $query->where('user_id', Auth::id());
+            } else {
+                // For guest orders, you might want to implement a token-based system
+                // For now, redirect guests to login
+                return redirect()->route('login')
+                    ->with('error', 'Please log in to view your orders.');
+            }
+
+            $order = $query->findOrFail($orderId);
+            return view('order_details', compact('order'));
+
+        } catch (\Exception $e) {
+            Log::error('Show order error: ' . $e->getMessage());
+            return redirect()->route('orders.index')
+                ->with('error', 'Order not found or access denied.');
+        }
+    }
+
+    /**
+     * Display user's order history
+     */
+    public function index()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('error', 'Please log in to view your order history.');
         }
 
-        // Calculate cart total from the current cart session
-        $cartTotal = collect($cart)->sum(fn($product) => ($product['price'] ?? 0) * ($product['quantity'] ?? 0));
-        session(['cart_total' => $cartTotal]); // Update session total
+        try {
+            $orders = Order::where('user_id', Auth::id())
+                           ->latest()
+                           ->paginate(15);
 
-        // Ensure cart total is valid for Razorpay (minimum INR 1.00)
-        if ($cartTotal < 1) {
-            Log::warning('Checkout attempted with invalid cart total:', ['total' => $cartTotal]);
-            return redirect()->route('cart.index')->with('error', 'Cart total must be at least ₹1.00 to proceed.');
+            return view('orders.index', compact('orders'));
+
+        } catch (\Exception $e) {
+            Log::error('Orders index error: ' . $e->getMessage());
+            return redirect()->route('home')
+                ->with('error', 'Failed to load orders. Please try again.');
+        }
+    }
+
+    /**
+     * Apply coupon code
+     */
+    public function applyCoupon(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'coupon_code' => 'required|string|max:50'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid coupon code format.'
+            ], 422);
         }
 
-        // Initialize Razorpay order variable
-        $razorpayOrder = null;
-        
-        // Check Razorpay configuration
+        // TODO: Implement coupon logic
+        // For now, return a placeholder response
+        return response()->json([
+            'success' => false,
+            'message' => 'Coupon system is currently under maintenance.'
+        ]);
+    }
+
+    /**
+     * Validate order request data
+     */
+    private function validateOrderRequest(Request $request)
+    {
+        return $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'street_address' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'state' => 'required|string|max:100',
+            'country' => 'required|string|max:100',
+            'payment_method' => 'required|in:cash_on_delivery,razorpay',
+            'razorpay_payment_id' => 'required_if:payment_method,razorpay|nullable|string',
+            'razorpay_order_id' => 'required_if:payment_method,razorpay|nullable|string',
+            'razorpay_signature' => 'required_if:payment_method,razorpay|nullable|string',
+        ]);
+    }
+
+    /**
+     * Create Razorpay order
+     */
+    private function createRazorpayOrder($cartTotal)
+    {
         $razorpayKey = env('RAZORPAY_KEY');
         $razorpaySecret = env('RAZORPAY_SECRET');
-        
-        // Debug logging
-        Log::info('Razorpay Configuration Check:', [
-            'key_exists' => !empty($razorpayKey),
-            'secret_exists' => !empty($razorpaySecret),
-            'key_value' => $razorpayKey,
-            'secret_value' => substr($razorpaySecret ?? '', 0, 10) . '...',
-            'is_placeholder_key' => $razorpayKey === 'rzp_test_your_key_here',
-            'is_placeholder_secret' => $razorpaySecret === 'your_secret_here',
-            'app_debug' => env('APP_DEBUG')
-        ]);
-        
+
+        // Check if keys are configured
         if (empty($razorpayKey) || empty($razorpaySecret) || 
             $razorpayKey === 'rzp_test_your_key_here' || 
             $razorpaySecret === 'your_secret_here') {
-            Log::warning('Razorpay keys not configured properly - using demo mode');
             
-            // Development mode: Create a dummy order for testing
+            Log::warning('Razorpay keys not configured properly');
+            
+            // In development, create a demo order
             if (env('APP_DEBUG', false)) {
                 $razorpayOrder = [
                     'id' => 'order_demo_' . time(),
@@ -73,283 +263,220 @@ class CheckoutController extends Controller
                     'receipt' => 'DEMO_' . uniqid(),
                     'status' => 'created'
                 ];
-                Log::info('Using demo Razorpay order for development', ['order_id' => $razorpayOrder['id']]);
                 session(['razorpay_order_id' => $razorpayOrder['id']]);
-            } else {
-                return redirect()->route('cart.index')->with('error', 'Payment gateway not configured. Please contact administrator.');
+                return $razorpayOrder;
             }
-        } else {
-            // Initialize Razorpay API with real keys
-            try {
-                $api = new Api($razorpayKey, $razorpaySecret);
-                
-                // Prepare Razorpay order data
-                $razorpayOrderData = [
-                    'receipt'         => 'ORD_' . uniqid() . '_' . time(),
-                    'amount'          => (int)($cartTotal * 100),
-                    'currency'        => 'INR',
-                    'payment_capture' => 1
-                ];
-
-                Log::info('Attempting to create Razorpay order with data:', $razorpayOrderData);
-
-                // Create Razorpay order
-                $razorpayOrder = $api->order->create($razorpayOrderData);
-                Log::info('Razorpay order created successfully:', ['order_id' => $razorpayOrder['id']]);
-                session(['razorpay_order_id' => $razorpayOrder['id']]);
-
-            } catch (BadRequestError $e) {
-                Log::error('Razorpay API Bad Request Error:', [
-                    'message' => $e->getMessage(), 
-                    'field' => $e->getField(), 
-                    'code' => $e->getCode(),
-                    'order_data' => $razorpayOrderData ?? null,
-                    'api_key' => substr($razorpayKey, 0, 10) . '...'
-                ]);
-                return redirect()->route('cart.index')->with('error', 'Failed to initialize payment gateway. Please check your cart or try again later.');
-            } catch (\Exception $e) {
-                Log::error('General Error creating Razorpay order:', [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'order_data' => $razorpayOrderData ?? null
-                ]);
-                return redirect()->route('cart.index')->with('error', 'An unexpected error occurred while preparing your order. Please try again.');
-            }
+            
+            return null;
         }
 
-        // Ensure razorpayOrder is not null for the view
-        if ($razorpayOrder === null) {
-            Log::error('RazorpayOrder is null after processing - creating fallback');
-            $razorpayOrder = [
-                'id' => 'order_fallback_' . time(),
+        try {
+            $api = new Api($razorpayKey, $razorpaySecret);
+            
+            $razorpayOrderData = [
+                'receipt' => 'ORD_' . uniqid() . '_' . time(),
                 'amount' => (int)($cartTotal * 100),
                 'currency' => 'INR',
-                'receipt' => 'FALLBACK_' . uniqid(),
-                'status' => 'created'
+                'payment_capture' => 1
             ];
-        }
 
-        // Pass necessary data to the checkout view
-        return view('checkout', compact('cart', 'cartTotal', 'razorpayOrder'));
+            $razorpayOrder = $api->order->create($razorpayOrderData);
+            session(['razorpay_order_id' => $razorpayOrder['id']]);
+            
+            Log::info('Razorpay order created', ['order_id' => $razorpayOrder['id']]);
+            return $razorpayOrder;
+
+        } catch (BadRequestError $e) {
+            Log::error('Razorpay order creation failed', [
+                'message' => $e->getMessage(),
+                'field' => $e->getField()
+            ]);
+            return null;
+            
+        } catch (\Exception $e) {
+            Log::error('Razorpay order creation error', ['message' => $e->getMessage()]);
+            return null;
+        }
     }
 
+    /**
+     * Verify Razorpay payment signature
+     */
+    private function verifyRazorpayPayment($validatedData)
+    {
+        if (env('APP_DEBUG', false) && 
+            strpos($validatedData['razorpay_order_id'], 'order_demo_') === 0) {
+            // Skip verification for demo orders in development
+            Log::info('Skipping Razorpay verification for demo order');
+            return true;
+        }
+
+        try {
+            $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
+            
+            $attributes = [
+                'razorpay_order_id' => $validatedData['razorpay_order_id'],
+                'razorpay_payment_id' => $validatedData['razorpay_payment_id'],
+                'razorpay_signature' => $validatedData['razorpay_signature']
+            ];
+
+            $api->utility->verifyPaymentSignature($attributes);
+            Log::info('Razorpay payment verified successfully');
+            return true;
+
+        } catch (SignatureVerificationError $e) {
+            Log::error('Razorpay signature verification failed', ['message' => $e->getMessage()]);
+            return false;
+            
+        } catch (\Exception $e) {
+            Log::error('Razorpay verification error', ['message' => $e->getMessage()]);
+            return false;
+        }
+    }
 
     /**
-     * Process the order placement after form submission.
-     * Handles both Cash on Delivery and Razorpay payments.
+     * Create order in database
      */
-    public function placeOrder(Request $request)
+    private function createOrder($validatedData, $cart, $orderTotal)
     {
-        // Log point 1: Raw Request Data (BEFORE anything else)
-        Log::info('=== placeOrder START ===');
-        Log::info('Incoming Request Data:', $request->all());
-
-        // Log point 2: Session Cart Data (Check immediately)
-        $cart = session('cart', []); // Get cart directly from session
-        Log::info('Cart Data Found in Session:', ['cart_empty' => empty($cart), 'cart_keys' => empty($cart) ? [] : array_keys($cart)]);
-
-        if (empty($cart)) {
-            Log::error('CRITICAL: Cart is empty at the very start of placeOrder. Session likely lost.');
-            return redirect()->route('cart.index')->with('error', 'Your session expired or cart is empty. Please add items again.');
-        }
-
-        // Backup cart immediately (in case validation fails and we need to redirect back)
-        session()->put('cart_backup', $cart);
-        Log::info('Cart backup created.');
-
-        // Log point 3: Validation Attempt
-        Log::info('Attempting validation...');
         try {
-            $validatedData = $request->validate([
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'phone' => 'required|string|max:20', // Adjust max length as needed
-                'street_address' => 'required|string|max:255',
-                'city' => 'required|string|max:100',
-                'state' => 'required|string|max:100',
-                'country' => 'required|string|max:100',
-                'payment_method' => 'required|in:cash_on_delivery,razorpay',
-                'razorpay_payment_id' => 'required_if:payment_method,razorpay|nullable|string',
-                'razorpay_order_id' => 'required_if:payment_method,razorpay|nullable|string',
-                'razorpay_signature' => 'required_if:payment_method,razorpay|nullable|string',
-            ]);
-            Log::info('Validation PASSED.');
+            $orderData = [
+                'user_id' => Auth::id(),
+                'products' => $cart,
+                'total_price' => $orderTotal,
+                'status' => ($validatedData['payment_method'] === 'razorpay') ? 'paid' : 'pending',
+                'first_name' => $validatedData['first_name'],
+                'last_name' => $validatedData['last_name'],
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'street_address' => $validatedData['street_address'],
+                'city' => $validatedData['city'],
+                'state' => $validatedData['state'],
+                'country' => $validatedData['country'],
+                'payment_method' => $validatedData['payment_method'],
+                'razorpay_payment_id' => $validatedData['razorpay_payment_id'] ?? null,
+                'razorpay_order_id' => $validatedData['razorpay_order_id'] ?? null,
+            ];
 
-        } catch (ValidationException $e) {
-            Log::error('Validation FAILED:', ['errors' => $e->errors(), 'input' => $request->except('password', 'password_confirmation')]); // Don't log passwords
-            // No need to restore cart here, as we redirect back with input, session should persist
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        }
-
-        // Log point 4: Payment Method Check & Signature Verification
-        Log::info('Payment Method Selected:', ['method' => $validatedData['payment_method']]);
-
-        if ($validatedData['payment_method'] === 'razorpay') {
-            // Verify that necessary Razorpay fields are present after validation
-            if (empty($validatedData['razorpay_payment_id']) || empty($validatedData['razorpay_order_id']) || empty($validatedData['razorpay_signature'])) {
-                 Log::error('CRITICAL: Razorpay payment method selected, but required fields are missing after validation.', $validatedData);
-                 session()->put('cart', session('cart_backup', [])); // Restore cart session
-                 return redirect()->route($this->getCheckoutRouteName())
-                        ->with('error', 'Payment details missing. Please try the payment process again.');
-            }
-
-            Log::info('Attempting Razorpay Signature Verification...');
-            $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
-            try {
-                $attributes = [
-                    'razorpay_order_id' => $validatedData['razorpay_order_id'],
-                    'razorpay_payment_id' => $validatedData['razorpay_payment_id'],
-                    'razorpay_signature' => $validatedData['razorpay_signature']
-                ];
-                $api->utility->verifyPaymentSignature($attributes);
-                Log::info('Razorpay Signature Verification PASSED.');
-
-            } catch (SignatureVerificationError $e) {
-                Log::error('Razorpay Signature Verification FAILED:', ['message' => $e->getMessage(), 'attributes' => $attributes]);
-                session()->put('cart', session('cart_backup', [])); // Restore cart session
-                return redirect()->route($this->getCheckoutRouteName())
-                       ->with('error', 'Payment verification failed. Security check did not pass. Please try again or contact support.');
-            } catch (\Exception $e) {
-                 Log::error('Razorpay Signature Verification General Error:', ['message' => $e->getMessage()]);
-                 session()->put('cart', session('cart_backup', [])); // Restore cart session
-                 return redirect()->route($this->getCheckoutRouteName())
-                        ->with('error', 'An error occurred during payment verification. Please contact support.');
-            }
-        }
-
-        // Log point 5: Use the backed-up cart for order creation
-        // This ensures we use the cart state from *before* potential modifications during the request lifecycle
-        $cartForOrder = session('cart_backup', []);
-        if (empty($cartForOrder)) {
-            // This is a fallback, should have been caught earlier if session was lost
-            Log::error('CRITICAL: Cart backup is empty AFTER validation/verification. This should not happen.');
-            return redirect()->route('cart.index')->with('error', 'Your cart session expired unexpectedly. Please try again.');
-        }
-        Log::info('Using cart from backup for order creation.', ['cart_empty' => empty($cartForOrder)]);
-
-
-        // Log point 6: Calculate Total from the cart being used for the order
-        $cartTotal = collect($cartForOrder)->sum(fn($product) => ($product['price'] ?? 0) * ($product['quantity'] ?? 0));
-        Log::info('Calculated Cart Total for Order:', ['total' => $cartTotal]);
-        if ($cartTotal <= 0) {
-             Log::error('CRITICAL: Cart total is zero or negative before order creation.', ['total' => $cartTotal]);
-             session()->put('cart', $cartForOrder); // Restore cart session
-             return redirect()->route($this->getCheckoutRouteName())->with('error', 'Cannot place order with zero total.');
-        }
-
-        // Log point 7: Check Auth User
-        $userId = Auth::id();
-        Log::info('Authenticated User ID:', ['user_id' => $userId ?? 'Guest/Not Logged In']);
-        // Decide if guest checkout is allowed or enforce login
-        if (!$userId && env('ALLOW_GUEST_CHECKOUT', false) == false) { // Example: Check an env variable
-             Log::error('User is not authenticated, and guest checkout is disabled.');
-             session()->put('cart', $cartForOrder); // Restore cart session
-             return redirect()->route('login')->with('error', 'Please log in to complete your order.');
-        }
-
-
-        // Log point 8: Prepare Order Data
-        $orderData = [
-            'user_id' => $userId, // Can be null if guest checkout is allowed and DB schema permits
-            'products' => $cartForOrder, // Pass the raw PHP array; Model casting will handle JSON encoding
-            'total_price' => $cartTotal,
-            'status' => ($validatedData['payment_method'] === 'razorpay') ? 'paid' : 'pending', // Use 'paid' for successful razorpay
-            'first_name' => $validatedData['first_name'],
-            'last_name' => $validatedData['last_name'],
-            'email' => $validatedData['email'],
-            'phone' => $validatedData['phone'],
-            'street_address' => $validatedData['street_address'],
-            'city' => $validatedData['city'],
-            'state' => $validatedData['state'],
-            'country' => $validatedData['country'],
-            'payment_method' => $validatedData['payment_method'],
-            'razorpay_payment_id' => $validatedData['razorpay_payment_id'] ?? null, // Use validated data, null if COD
-            'razorpay_order_id' => $validatedData['razorpay_order_id'] ?? null,     // Use validated data, null if COD
-            // DO NOT store the signature
-        ];
-        Log::info('Data Prepared for Order::create (using model casting for products):', $orderData);
-
-        // Log point 9: Attempt Order Creation
-        Log::info('Attempting Order::create...');
-        try {
-            // Ensure your Order model's $fillable array includes ALL keys from $orderData
             $order = Order::create($orderData);
-            Log::info('Order::create SUCCEEDED.', ['order_id' => $order->id]);
+            Log::info('Order created in database', ['order_id' => $order->id]);
+            
+            return $order;
 
         } catch (\Exception $e) {
-            Log::error('CRITICAL: Order::create FAILED:', [
-                'error_message' => $e->getMessage(),
-                'error_trace' => $e->getTraceAsString(), // Full trace for detailed debugging
-                'order_data_attempted' => $orderData // Log the exact data that failed
-                ]);
-            // Restore the cart session before redirecting
-            session()->put('cart', $cartForOrder);
-            return redirect()->route($this->getCheckoutRouteName())
-                   ->with('error', 'We encountered a problem saving your order details. Please contact support if this issue persists.');
+            Log::error('Order creation failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return null;
         }
-
-        // Log point 10: Clear Session data related to the completed cart/order
-        Log::info('Order placed successfully. Clearing session data...', ['keys_to_forget' => ['cart', 'cart_total', 'cart_backup', 'razorpay_order_id']]);
-        session()->forget(['cart', 'cart_total', 'cart_backup', 'razorpay_order_id']);
-        Log::info('Session data cleared.');
-
-        // Log point 11: Redirecting to Order Show page
-        Log::info('Redirecting to orders.show route.', ['order_id' => $order->id]);
-        // Redirect to the order confirmation/details page
-        return redirect()->route('orders.show', $order->id)->with('success', 'Your order has been placed successfully!');
-    }
-
-
-    /**
-     * Display the details of a specific order.
-     */
-    public function showOrder($orderId)
-    {
-        // Find the order, ensuring it belongs to the logged-in user (if applicable)
-        $query = Order::query();
-        if (Auth::check()) {
-             // Restrict access for logged-in users to their own orders
-             $query->where('user_id', Auth::id());
-        } else {
-             // Handle guest access if needed - perhaps via a unique token stored in session/email?
-             // For now, let's assume guests can't view past orders this way easily.
-             // If guests placed the order, you might need another way to look it up.
-             // Temporarily, let's just find by ID, but add auth checks if needed.
-            // return redirect()->route('login')->with('error', 'Please log in to view your orders.');
-        }
-
-        $order = $query->findOrFail($orderId); // Find order by ID, respecting user scope if logged in
-
-        // You might need to eager load related data like user or items if displaying them
-        // $order->load('user', 'items');
-
-        return view('order_details', compact('order')); // Ensure you have an 'order_details.blade.php' view
     }
 
     /**
-     * Display a list of the current user's orders.
+     * Calculate cart total
      */
-    public function index()
+    private function calculateCartTotal($cart)
     {
-        // Ensure user is authenticated to view their order history
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please log in to view your order history.');
-        }
-
-        $orders = Order::where('user_id', Auth::id())
-                       ->latest() // Order by most recent first
-                       ->paginate(15); // Use pagination for large lists
-
-        return view('orders.index', compact('orders')); // Ensure you have an 'orders/index.blade.php' view
+        return collect($cart)->sum(fn($product) => 
+            ($product['price'] ?? 0) * ($product['quantity'] ?? 0)
+        );
     }
 
+    /**
+     * Restore cart from backup
+     */
+    private function restoreCart()
+    {
+        $backup = session('cart_backup', []);
+        if (!empty($backup)) {
+            session(['cart' => $backup]);
+            Log::info('Cart restored from backup');
+        }
+    }
 
     /**
-     * Helper to get the checkout route name.
+     * Reorder items from a previous order
      */
-    private function getCheckoutRouteName(): string
+    public function reorder(Request $request, $orderId)
     {
-        return 'checkout';
+        try {
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please log in to reorder items.'
+                ], 401);
+            }
+
+            $order = Order::where('user_id', Auth::id())->findOrFail($orderId);
+            
+            if (!is_array($order->products) || empty($order->products)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No items found in this order to reorder.'
+                ], 400);
+            }
+
+            $cart = session('cart', []);
+            $addedItems = 0;
+
+            foreach ($order->products as $productId => $productData) {
+                // Verify product still exists and is available
+                $product = Product::find($productId);
+                if (!$product) {
+                    continue; // Skip if product no longer exists
+                }
+
+                $quantity = $productData['quantity'] ?? 1;
+                
+                if (isset($cart[$productId])) {
+                    $cart[$productId]['quantity'] += $quantity;
+                } else {
+                    $cart[$productId] = [
+                        "name" => $product->name,
+                        "price" => $product->price,
+                        "image" => $product->images->first()?->image_path ?? 'images/no-image.png',
+                        "quantity" => $quantity
+                    ];
+                }
+                $addedItems++;
+            }
+
+            if ($addedItems === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No items could be added to cart. Products may no longer be available.'
+                ], 400);
+            }
+
+            session(['cart' => $cart]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$addedItems} item(s) added to your cart successfully!",
+                'cart_count' => count($cart),
+                'redirect_url' => route('cart.index')
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Reorder error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reorder items. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear checkout-related session data
+     */
+    private function clearCheckoutSession()
+    {
+        session()->forget([
+            'cart', 
+            'cart_total', 
+            'cart_backup', 
+            'razorpay_order_id'
+        ]);
+        Log::info('Checkout session data cleared');
     }
 }

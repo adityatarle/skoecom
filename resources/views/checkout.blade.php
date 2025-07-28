@@ -75,21 +75,22 @@
                     <!-- Billing Details -->
                     <div class="col-lg-6 col-md-6">
                         <h3>Billing Details</h3>
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <div class="row">
                             <div class="mb-20 col-lg-6">
-                                @if (session('success'))
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        {{ session('success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-
-                                @if (session('error'))
-                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        {{ session('error') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
 
                                 <label>First Name <span>*</span></label>
                                 <input type="text" name="first_name" value="{{ auth()->check() ? auth()->user()->first_name : old('first_name') }}" required>
@@ -226,33 +227,105 @@
 <!-- Razorpay Checkout Script -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    document.getElementById('place-order-btn').onclick = function(e) {
-        e.preventDefault();
-        var paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value;
+document.addEventListener('DOMContentLoaded', function() {
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    const checkoutForm = document.getElementById('checkout-form');
+    
+    // Form validation
+    function validateForm() {
+        const requiredFields = checkoutForm.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        let firstInvalidField = null;
 
+        requiredFields.forEach(field => {
+            const value = field.value.trim();
+            if (!value) {
+                field.style.borderColor = '#dc3545';
+                if (!firstInvalidField) {
+                    firstInvalidField = field;
+                }
+                isValid = false;
+            } else {
+                field.style.borderColor = '';
+            }
+        });
+
+        // Email validation
+        const emailField = checkoutForm.querySelector('input[type="email"]');
+        if (emailField && emailField.value) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailField.value)) {
+                emailField.style.borderColor = '#dc3545';
+                if (!firstInvalidField) {
+                    firstInvalidField = emailField;
+                }
+                isValid = false;
+            }
+        }
+
+        if (!isValid && firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        return isValid;
+    }
+
+    // Payment method validation
+    function validatePaymentMethod() {
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked')?.value;
         if (!paymentMethod) {
             alert('Please select a payment method.');
+            return false;
+        }
+        return paymentMethod;
+    }
+
+    // Place order button click handler
+    placeOrderBtn.onclick = function(e) {
+        e.preventDefault();
+        
+        // Disable button to prevent double submission
+        placeOrderBtn.disabled = true;
+        const originalText = placeOrderBtn.textContent;
+        placeOrderBtn.textContent = 'Processing...';
+
+        // Validate form
+        if (!validateForm()) {
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.textContent = originalText;
+            return;
+        }
+
+        // Validate payment method
+        const paymentMethod = validatePaymentMethod();
+        if (!paymentMethod) {
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.textContent = originalText;
             return;
         }
 
         if (paymentMethod === 'razorpay') {
-            var options = {
+            // Initialize Razorpay
+            const options = {
                 "key": "{{ env('RAZORPAY_KEY') }}",
                 "amount": "{{ $razorpayOrder['amount'] }}",
                 "currency": "INR",
-                "name": "Your Company Name",
+                "name": "Ecommerce Store",
                 "description": "Order Payment",
                 "image": "{{ asset('images/logo.png') }}",
                 "order_id": "{{ $razorpayOrder['id'] }}",
                 "handler": function(response) {
                     console.log('Razorpay Payment Success:', response);
+                    
+                    // Set Razorpay response values
                     document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
                     document.getElementById('razorpay_signature').value = response.razorpay_signature;
                     document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
-                    var form = document.getElementById('checkout-form');
-                    var formData = new FormData(form);
-                    console.log('Submitting form with data:', Object.fromEntries(formData));
-                    form.submit();
+                    
+                    // Submit the form
+                    console.log('Submitting form after successful payment');
+                    checkoutForm.submit();
                 },
                 "prefill": {
                     "name": "{{ old('first_name', auth()->check() ? auth()->user()->first_name : '') }} {{ old('last_name', auth()->check() ? auth()->user()->last_name : '') }}",
@@ -260,35 +333,61 @@
                     "contact": "{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}"
                 },
                 "theme": {
-                    "color": "#3399cc"
+                    "color": "#b89f7e"
                 },
                 "modal": {
                     "ondismiss": function() {
                         console.log('Razorpay modal dismissed');
-                        window.location.href = "{{ route('cart.index') }}";
+                        placeOrderBtn.disabled = false;
+                        placeOrderBtn.textContent = originalText;
                     }
                 }
             };
 
             try {
-                var rzp = new Razorpay(options);
+                const rzp = new Razorpay(options);
+                
+                rzp.on('payment.failed', function(response) {
+                    console.log('Razorpay Payment Failed:', response);
+                    alert('Payment failed: ' + (response.error.description || 'Please try again'));
+                    placeOrderBtn.disabled = false;
+                    placeOrderBtn.textContent = originalText;
+                });
+
                 rzp.open();
                 console.log('Razorpay modal opened');
+                
             } catch (error) {
                 console.error('Razorpay initialization failed:', error);
-                alert('Failed to initialize payment: ' + error.message);
+                alert('Failed to initialize payment gateway. Please try again.');
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = originalText;
             }
-
-            rzp.on('payment.failed', function(response) {
-                console.log('Razorpay Payment Failed:', response);
-                alert('Payment failed: ' + response.error.description);
-                window.location.href = "{{ route('cart.index') }}";
-            });
         } else {
-            console.log('Submitting form for payment method:', paymentMethod);
-            document.getElementById('checkout-form').submit();
+            // Cash on delivery - submit form directly
+            console.log('Submitting form for Cash on Delivery');
+            checkoutForm.submit();
         }
     };
+
+    // Real-time validation feedback
+    const inputs = checkoutForm.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.style.borderColor === 'rgb(220, 53, 69)') {
+                this.style.borderColor = '';
+            }
+        });
+    });
+});
 </script>
 
 @include('layout.footer')
