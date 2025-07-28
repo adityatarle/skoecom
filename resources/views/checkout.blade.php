@@ -200,11 +200,22 @@
                         <!-- Payment Method -->
                         <div class="payment_method">
                             <h3>Select Payment Method</h3>
+                            
+                            @if(str_contains($razorpayOrder['id'], 'demo') || str_contains($razorpayOrder['id'], 'fallback'))
+                                <div class="alert alert-info" style="margin-bottom: 15px; padding: 10px; background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 5px;">
+                                    <strong>Demo Mode:</strong> Razorpay is running in demo mode. Online payments will be simulated.
+                                </div>
+                            @endif
+                            
                             <label>
                                 <input id="payment_cash" name="payment_method" type="radio" value="cash_on_delivery" required style="width: 5%;"> Cash on Delivery
                             </label>
                             <label>
-                                <input id="payment_razorpay" name="payment_method" type="radio" value="razorpay" style="width: 5%;"> Razorpay
+                                <input id="payment_razorpay" name="payment_method" type="radio" value="razorpay" style="width: 5%;"> 
+                                Razorpay 
+                                @if(str_contains($razorpayOrder['id'], 'demo') || str_contains($razorpayOrder['id'], 'fallback'))
+                                    <small style="color: #17a2b8;">(Demo Mode)</small>
+                                @endif
                             </label>
 
                             <!-- Hidden fields for Razorpay -->
