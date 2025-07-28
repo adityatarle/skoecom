@@ -1,400 +1,224 @@
+
 @include('layout.header')
 
-<section class="py-3" id="home" style="background-image: url('images/background-pattern.jpg');background-repeat: no-repeat;background-size: cover;">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-
-                <div class="banner-blocks">
-
-                    <div class="banner-ad large bg-info block-1">
-
-                        <div class="swiper main-swiper">
-                            <div class="swiper-wrapper">
-
-                                <div class="swiper-slide">
-                                    <div class="row banner-content p-5">
-                                        <div class="content-wrapper col-md-7">
-                                            <div class="categories my-3">Premium Grade</div>
-                                            <h3 class="display-4">Finest Saffron Threads</h3>
-                                            <p>Experience the rich aroma and exquisite flavor of our hand-picked saffron.</p>
-                                            <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1 px-4 py-3 mt-3">Shop Now</a>
-                                        </div>
-                                        <div class="img-wrapper col-md-5">
-                                            <img src="images/product-thumb-1.png" class="img-fluid">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="swiper-slide">
-                                    <div class="row banner-content p-5">
-                                        <div class="content-wrapper col-md-7">
-                                            <div class="categories mb-3 pb-3">100% Pure</div>
-                                            <h3 class="banner-title">Saffron for Culinary Use</h3>
-                                            <p>Enhance your dishes with our top-quality saffron threads. Perfect for all your culinary needs.</p>
-                                            <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">Shop Collection</a>
-                                        </div>
-                                        <div class="img-wrapper col-md-5">
-                                            <img src="images/product-thumb-1.png" class="img-fluid">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="swiper-slide">
-                                    <div class="row banner-content p-5">
-                                        <div class="content-wrapper col-md-7">
-                                            <div class="categories mb-3 pb-3">Luxury Spices</div>
-                                            <h3 class="banner-title">Saffron Infused Products</h3>
-                                            <p>Discover the luxury of saffron in our range of infused oils, teas and more.</p>
-                                            <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">Explore Products</a>
-                                        </div>
-                                        <div class="img-wrapper col-md-5">
-                                            <img src="images/product-thumb-2.png" class="img-fluid">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="swiper-pagination"></div>
-
+<!--slider area start-->
+<div class="slider_area home_slider_three owl-carousel">
+        <div class="single_slider" style="background-image: url('assets/img/slider/banner.jpg');">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="slider_content">
+                            <p>exclusive offer -10% off this week</p>
+                            <h1>Rings For Women</h1>
+                            <p class="slider_price">starting at <span>$2,199.00</span></p>
+                            <a class="button" href="shop.html">Shop Now</a>
                         </div>
                     </div>
-
-                    <div class="banner-ad bg-success-subtle block-2" style="background:url('images/ad-image-1.png') no-repeat;background-position: right bottom">
-                        <div class="row banner-content p-5">
-
-                            <div class="content-wrapper col-md-7">
-                                <div class="categories sale mb-3 pb-3">Limited Time Offer</div>
-                                <h3 class="banner-title">Saffron Gift Sets</h3>
-                                <a href="#" class="d-flex align-items-center nav-link">Explore Gift Sets <svg width="24" height="24">
-                                        <use xlink:href="#arrow-right"></use>
-                                    </svg></a>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="banner-ad bg-danger block-3" style="background:url('images/ad-image-2.png') no-repeat;background-position: right bottom">
-                        <div class="row banner-content p-5">
-
-                            <div class="content-wrapper col-md-7">
-                                <div class="categories sale mb-3 pb-3">Special Deal</div>
-                                <h3 class="item-title">Saffron Bundles</h3>
-                                <a href="#" class="d-flex align-items-center nav-link">View Bundles <svg width="24" height="24">
-                                        <use xlink:href="#arrow-right"></use>
-                                    </svg></a>
-                            </div>
-
-                        </div>
-                    </div>
-
                 </div>
-                <!-- / Banner Blocks -->
-
+            </div>
+        </div>
+        <div class="single_slider" style="background-image: url('assets/img/slider/slider5.jpg');">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-12">
+                        <div class="slider_content">
+                            <p>exclusive offer -10% off this week</p>
+                            <h1>Rings For Women</h1>
+                            <p class="slider_price">starting at <span>$2,199.00</span></p>
+                            <a class="button" href="shop.html">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>
+<!--slider area end-->
 
-<section class="about-us-section py-5" id="about" style="background-color: #f8f9fa;">
+<!--shipping area start-->
+<div class="shipping_area shipping_two">
     <div class="container">
-        <h2 class="text-center mb-5" style="font-size: 2.5rem; font-weight: 700; color: #212529; text-transform: capitalize;">About Us</h2>
-        <div class="row align-items-center">
-            <div class="col-md-6 about-us-image-container position-relative">
-                <div class="about-us-image-wrapper">
-                    <img src="{{ asset('images/about.jpg') }}" alt="About Us" class="about-us-image img-fluid rounded-4">
-                    <div class="about-us-image-overlay"></div>
-                </div>
-                <div class="about-us-shape"></div>
-                <div class="about-us-shape-2"></div>
-            </div>
-            <div class="col-md-6 about-us-content-container">
-                <div class="about-us-content p-5">
-                    <h2 class="about-us-title display-4 mb-4 position-relative">Our Passion</h2>
-                    <p class="about-us-text mb-4 position-relative">
-                        At Preona, we're driven by a passion for quality and authenticity. Our commitment goes beyond sourcing just the best saffron and other natural ingredients; we also strive to create a brand that inspires and captivates.
-                    </p>
-                    <div class="about-us-mission mt-4 mb-4 position-relative">
-                        <h4 class="about-us-mission-title">Our Mission</h4>
-                        <p class="about-us-mission-text">To bring the most authentic and high quality saffron to every household, and to empower individuals to enhance their health and beauty in natural, ethical ways.
-                        </p>
-                    </div>
-                    <div class="about-us-values mt-4 mb-4 position-relative">
-                        <h4 class="about-us-value-title">Core Values</h4>
-                        <ul class="list-unstyled">
-                            <li class="about-us-value-item">Ethical Sourcing</li>
-                            <li class="about-us-value-item">Quality and Purity</li>
-                            <li class="about-us-value-item">Sustainability</li>
-                            <li class="about-us-value-item">Customer Satisfaction</li>
-                        </ul>
-                    </div>
-                    <a href="{{route('products')}}" class="btn btn-primary btn-lg mt-4 about-us-button position-relative">Explore Our Products</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5 overflow-hidden" id="categories-section" style="background-color: white; color: black;">
-    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <div class="section-header d-flex flex-wrap justify-content-between mb-5">
-                    <h2 class="section-title">Categories</h2>
-
-                    <div class="d-flex align-items-center">
-                        <a href="#products-section" class="btn-link text-decoration-none" aria-label="View all categories">View All Categories →</a>
-                        <div class="swiper-buttons">
-                            <button class="swiper-prev category-carousel-prev btn btn-yellow" aria-label="Previous category">❮</button>
-                            <button class="swiper-next category-carousel-next btn btn-yellow" aria-label="Next category">❯</button>
-                        </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="single-shipping">
+                    <div class="shipping_icone icone_1">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="shipping_content">
+                        <h3>Free Shipping</h3>
+                        <p>Free shipping on all orders</p>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="category-carousel swiper">
-                    <div class="swiper-wrapper">
-                        @foreach($categories as $category)
-                        <div class="swiper-slide">
-                            <a href="{{route('products',['category'=>$category->name])}}" class="nav-link category-item" aria-label="View {{ $category->name }} category">
-                                <div class="category-image-container">
-                                    @if($category->image)
-                                    <img src="{{ asset($category->image) }}" alt="{{ $category->name }} category image" class="category-image">
-                                    @else
-                                    <img src="{{ asset('images/no-image.jpg') }}" alt="Default category thumbnail" class="category-image">
-                                    @endif
-                                </div>
-                                <h3 class="category-title">{{$category->name}}</h3>
-                            </a>
-                        </div>
-                        @endforeach
+            <div class="col-lg-3 col-md-6">
+                <div class="single-shipping">
+                    <div class="shipping_icone icone_2">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <div class="shipping_content">
+                        <h3>Money Return</h3>
+                        <p>Back guarantee under 7 days</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="single-shipping">
+                    <div class="shipping_icone icone_3">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="shipping_content">
+                        <h3>Member Discount</h3>
+                        <p>On every order over $120.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="single-shipping">
+                    <div class="shipping_icone icone_4">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="shipping_content">
+                        <h3>Online Support</h3>
+                        <p>Support online 24 hours a day</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
+<!--shipping area end-->
 
-
-
-<section class="py-5 overflow-hidden" id="latest-product" style="background-color: white; color: black;">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-
-                <div class="section-header d-flex flex-wrap flex-wrap justify-content-between mb-5">
-                    <h2 class="section-title">Latest Products</h2>
-                    <div class="d-flex align-items-center">
-                        <a href="#products-section" class="btn-link text-decoration-none">View All Products →</a>
-                        <div class="swiper-buttons">
-                            <button class="swiper-prev brand-carousel-prev btn btn-yellow">❮</button>
-                            <button class="swiper-next brand-carousel-next btn btn-yellow">❯</button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-
-                <div class="brand-carousel swiper">
-                    <div class="swiper-wrapper">
-                        @if($latestProducts->isEmpty())
-                        <p>No products have been added yet.</p>
-                        @else
-                        @foreach($latestProducts as $product)
-                        <div class="swiper-slide">
-                            <div class="card mb-3 p-3 rounded-4 shadow border-0">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <div class="image-container">
-                                            @if($product->images->first())
-                                            <img src="{{ asset($product->images->first()->image_path) }}" class="img-fluid rounded" alt="{{ $product->name }}">
-                                            @else
-                                            <img src="{{ asset('images/no-image.jpg') }}" class="img-fluid rounded" alt="{{ $product->name }}">
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body py-0">
-                                            <a href="{{ route('product.details', $product->id) }}" class="product-link">
-                                                @if($product->category)
-                                                <p class="text-muted mb-0">{{ $product->category->name }}</p>
-                                                @endif
-                                                <h5 class="card-title">{{ $product->name }}</h5>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
+<!--product section area start-->
 <section class="py-5" id="products-section" style="background-color: white; color: black;">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="bootstrap-tabs product-tabs">
-                    <div class="tabs-header d-flex justify-content-between border-bottom my-5">
-                        <h3>Products</h3>
-                        <div class="d-flex align-items-center">
-                            <!-- Dropdown for Mobile -->
-                            <div class="d-md-none">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Select Category
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                                        <li><a class="dropdown-item text-uppercase fs-6 {{request('category') == null || request('category') == 'all' ? 'active' : ''}}" href="{{route('main.page',['category'=>'all'])}}">All</a></li>
-                                        @foreach($categories as $category)
-                                        <li><a class="dropdown-item text-uppercase fs-6 {{request('category') == $category->name ? 'active' : ''}}" href="{{route('main.page',['category'=>$category->name])}}">{{ $category->name }}</a></li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- Nav Tabs for Desktop -->
-                            <nav class="d-none d-md-block">
-                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                    <a href="{{route('main.page',['category'=>'all'])}}" class="nav-link text-uppercase fs-6 {{request('category') == null || request('category') == 'all' ? 'active' : ''}}" id="nav-all-tab" data-bs-toggle="tab" data-bs-target="#nav-all">All</a>
-                                    @foreach($categories as $category)
-                                    <a href="{{route('main.page',['category'=>$category->name])}}" class="nav-link text-uppercase fs-6 {{request('category') == $category->name ? 'active' : ''}}" id="nav-{{ Str::slug($category->name) }}-tab" data-bs-toggle="tab" data-bs-target="#nav-{{ Str::slug($category->name) }}">{{ $category->name }}</a>
-                                    @endforeach
-                                </div>
-                            </nav>
+                    <div class="d-flex justify-content-center border-bottom my-5"> <!-- Centering the tab buttons -->
+                        <!--Product Tab Buttons-->
+                        <div class="product_tab_button">
+                            <ul class="nav" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request('category') == null || request('category') == 'all' ? 'active' : '' }}" data-bs-toggle="tab" href="#nav-all" role="tab" aria-controls="nav-all" aria-selected="{{ request('category') == null || request('category') == 'all' ? 'true' : 'false' }}">All</a>
+                                </li>
+                                @foreach ($categories as $category)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request('category') == $category->name ? 'active' : '' }}" data-bs-toggle="tab" href="#nav-{{ Str::slug($category->name) }}" role="tab" aria-controls="nav-{{ Str::slug($category->name) }}" aria-selected="{{ request('category') == $category->name ? 'true' : 'false' }}">{{ $category->name }}</a>
+                                </li>
+                                @endforeach
+                            </ul>
                         </div>
+                        <!-- End Product Tab Buttons -->
                     </div>
                     <div class="tab-content" id="nav-tabContent">
-                        <div class="tab-pane fade show {{request('category') == null || request('category') == 'all' ? 'active' : ''}}" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
+                        <div class="tab-pane fade show {{ request('category') == null || request('category') == 'all' ? 'active' : '' }}" id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab">
                             <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
-                                @foreach($productsByCategory['All'] as $product)
-                                <div class="col">
-                                    <div class="product-item">
-                                        @if($product->discount > 0)
-                                        <span class="badge bg-success position-absolute m-3">-{{ $product->discount }}%</span>
-                                        @endif
-                                        <a href="#" class="btn-wishlist"><svg width="24" height="24">
-                                                <use xlink:href="#heart"></use>
-                                            </svg></a>
-                                        <figure class="product-image-container">
-                                            @if($product->images->first())
-                                            <a href="{{ route('product.details', $product->id) }}" class="glightbox">
-                                                <img src="{{ asset($product->images->first()->image_path) }}" class="product-img" alt="{{ $product->name }}">
-                                            </a>
-                                            @else
-                                            <img src="{{ asset('images/no-image.png') }}" class="product-img" alt="No Image">
-                                            @endif
-                                        </figure>
-                                        <a href="{{ route('product.details', $product->id) }}" class="product-link">
-                                            @if($product->category)
-                                            <p class="text-muted mb-0">{{ $product->category->name }}</p>
-                                            @endif
-                                            <h3>{{ $product->name }}</h3>
-                                        </a>
+                                @foreach ($productsByCategory['All'] as $product)
+                                <div class="col"> <!-- product_column3 grid system use -->
+                                    <div class="single_product">
+                                        <div class="product_thumb">
+                                            <a class="primary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt=""></a>
+                                            <a class="secondary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt=""></a>
+                                            <div class="quick_button">
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" data-placement="top" data-original-title="quick view"> quick view</a>
+                                            </div>
+                                        </div>
+                                        <div class="product_content">
+                                            <div class="tag_cate">
+                                                <a href="#">Clothing,</a>
+                                                <a href="#">Potato chips</a>
+                                            </div>
+                                            <h3><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></h3>
+                                            <div class="price_box">
+                                                @if($product->old_price)
+                                                <span class="old_price">${{ $product->old_price }}</span>
+                                                @endif
+                                                <span class="current_price">${{ $product->price }}</span>
+                                            </div>
+                                            <div class="product_hover">
+                                                <div class="product_ratings">
+                                                    <ul>
+                                                        <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
+                                                        <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
+                                                        <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
+                                                        <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
+                                                        <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
+                                                    </ul>
+                                                </div>
+                                                <!-- <div class="product_desc">
+                                                <p>{!! $product->description !!}</p>
 
-                                        <a href="{{ route('product.details', $product->id) }}" class="product-link" style="display: inline-block; margin-bottom: 5px;">
-                                            <span class="rating-display" style="vertical-align: middle;">
-                                                @php
-                                                $defaultRating = 4;
-                                                $averageRating = isset($reviews[$product->id]) ? $reviews[$product->id]->avg('rating') : $defaultRating;
-                                                @endphp
-                                                @for($i=1; $i<=5; $i++)
-                                                    @if ($i <=$averageRating)
-                                                    <svg width="20" height="20" class="text-primary star-icon" style="vertical-align: middle; margin-right:2px;">
-                                                    <use xlink:href="#star-solid"></use>
-                                                    </svg>
-                                                    @else
-                                                    <svg width="16" height="16" class="text-secondary star-icon" style="vertical-align: middle; margin-right:2px;">
-                                                        <use xlink:href="#star"></use>
-                                                    </svg>
-                                                    @endif
-                                                    @endfor
-
-                                            </span>
-                                        </a>
-
-                                        <span class="price">₹{{ $product->price }}</span>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <a href="{{ route('cart.add', $product->id) }}" class="nav-link add-to-cart-btn" data-id="{{ $product->id }}">
-                                                Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon>
-                                            </a>
-
+                                                </div> -->
+                                                <div class="action_links">
+                                                    <ul>
+                                                        <li>
+                                                            <a href="#" class="add_to_wishlist" data-id="{{ $product->id }}" title="Add to Wishlist">
+                                                                ❤️
+                                                            </a>
+                                                        </li>
+                                                        <li class="add_to_cart"><a href="#" class="add_to_cart1" data-id="{{ $product->id }}" title="add to cart">add to cart</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> <!-- product_column3 grid system use -->
                                 @endforeach
                             </div>
                         </div>
-                        @foreach($categories as $category)
-                        <div class="tab-pane fade {{request('category') == $category->name ? 'show active' : ''}}" id="nav-{{ Str::slug($category->name) }}" role="tabpanel" aria-labelledby="nav-{{ Str::slug($category->name) }}-tab">
+                        @foreach ($categories as $category)
+                        <div class="tab-pane fade {{ request('category') == $category->name ? 'show active' : '' }}" id="nav-{{ Str::slug($category->name) }}" role="tabpanel" aria-labelledby="nav-{{ Str::slug($category->name) }}-tab">
                             <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
-                                @if(isset($productsByCategory[$category->name]))
-                                @foreach($productsByCategory[$category->name] as $product)
-                                <div class="col">
-                                    <div class="product-item">
-                                        @if($product->discount > 0)
-                                        <span class="badge bg-success position-absolute m-3">-{{ $product->discount }}%</span>
-                                        @endif
-                                        <a href="#" class="btn-wishlist"><svg width="24" height="24">
-                                                <use xlink:href="#heart"></use>
-                                            </svg></a>
-                                        <figure class="product-image-container">
-                                            @if($product->images->first())
-                                            <a href="{{ route('product.details', $product->id) }}" title="{{ $product->name }}">
-                                                <img src="{{ asset($product->images->first()->image_path) }}" class="product-img" alt="{{ $product->name }}">
-                                            </a>
-                                            @else
-                                            <img src="{{ asset('images/no-image.png') }}" class="product-img" alt="No Image">
-                                            @endif
-                                        </figure>
-                                        <a href="{{ route('product.details', $product->id) }}" class="product-link">
-                                            @if($product->category)
-                                            <p class="text-muted mb-0">{{ $product->category->name }}</p>
-                                            @endif
-                                            <h3>{{ $product->name }}</h3>
-                                        </a>
-                                        <a href="{{ route('product.details', $product->id) }}" class="product-link" style="display: inline-block; margin-bottom: 10px;">
-                                            <span class="rating-display" style="vertical-align: middle;">
-                                                @php
-                                                $defaultRating = 4;
-                                                $averageRating = isset($reviews[$product->id]) ? $reviews[$product->id]->avg('rating') : $defaultRating;
-                                                @endphp
-                                                @for($i=1; $i<=5; $i++)
-                                                    @if ($i <=$averageRating)
-                                                    <svg width="16" height="16" class="text-primary star-icon" style="vertical-align: middle; margin-right:2px;">
-                                                    <use xlink:href="#star-solid"></use>
-                                                    </svg>
-                                                    @else
-                                                    <svg width="16" height="16" class="text-secondary star-icon" style="vertical-align: middle; margin-right:2px;">
-                                                        <use xlink:href="#star"></use>
-                                                    </svg>
-                                                    @endif
-                                                    @endfor
-                                                    ({{$averageRating}})
-                                            </span>
-                                        </a>
-                                        <span class="price">₹{{ $product->price }}</span>
-                                        <div class="d-flex align-items-center justify-content-between">
-
-                                            <a href="javascript:void(0)" class="nav-link add-to-cart-btn" data-id="{{ $product->id }}">
-                                                Add to Cart <iconify-icon icon="uil:shopping-cart"></iconify-icon>
-                                            </a>
+                                @if (isset($productsByCategory[$category->name]))
+                                @foreach ($productsByCategory[$category->name] as $product)
+                                <div class="col"> <!-- product_column3 grid system use -->
+                                    <div class="single_product">
+                                        <div class="product_thumb">
+                                            <a class="primary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt="{{ $product->name }}"></a>
+                                            <a class="secondary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->count() > 1 ? asset($product->images[1]->image_path) : asset($product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png')) }}" alt="{{ $product->name }}"></a>
+                                            <div class="quick_button">
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" data-placement="top" data-original-title="quick view"> quick view</a>
+                                            </div>
+                                        </div>
+                                        <div class="product_content">
+                                            <div class="tag_cate">
+                                                @if ($product->category)
+                                                <a href="#">{{ $product->category->name }}</a>
+                                                @endif
+                                            </div>
+                                            <h3><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></h3>
+                                            <div class="price_box">
+                                                @if ($product->old_price)
+                                                <span class="old_price">₹{{ number_format($product->old_price, 2) }}</span>
+                                                @endif
+                                                <span class="current_price">₹{{ number_format($product->price, 2) }}</span>
+                                            </div>
+                                            <div class="product_hover">
+                                                <div class="product_ratings">
+                                                    {{-- Implement your rating display logic here --}}
+                                                </div>
+                                                <div class="product_desc">
+                                                    <p>{{ $product->description }}</p>
+                                                </div>
+                                                <div class="action_links">
+                                                    <ul>
+                                                        <li>
+                                                            <form action="{{ route('wishlist.add', $product->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" data-placement="top" title="Add to Wishlist" data-bs-toggle="tooltip">
+                                                                    <span class="icon icon-Heart"></span>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                        <li class="add_to_cart"><a href="{{ route('cart.add', $product->id) }}" title="add to cart">add to cart</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> <!-- product_column3 grid system use -->
                                 @endforeach
                                 @else
-                                <p> No Products for this category </p>
+                                <p>No Products for this category</p>
                                 @endif
                             </div>
                         </div>
@@ -405,116 +229,171 @@
         </div>
     </div>
 </section>
+<!--product section area end-->
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<!--banner fullwidth start-->
+<section class="banner_fullwidth position-relative overflow-hidden mb-5 mb-md-5">
+    <div class="container">
+        <div class="row align-items-center h-100">
+            <div class="col-12">
+                <div class="banner_text text-center mx-auto rounded-3 shadow-sm">
+                    <p class="text-uppercase mb-2 fw-light ls-2 text-dusty-rose">Sale Off 20% All Products</p>
+                    <h2 class="display-4 text-capitalize mb-3 fw-bold text-deep-brown">New Trending Collection</h2>
+                    <span class="d-block mb-4 fst-italic text-warm-gray">We Believe That Good Design is Always in Season</span>
+                    <a href="shop.html" class="btn btn-outline-soft-gold text-uppercase fw-medium px-5 py-2 rounded-1 mt-4">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--banner area end-->
 
-<section class="py-5">
-    <div class="container-fluid">
+<!--blog section area start-->
+<section class="blog_section">
+    <div class="container">
         <div class="row">
-
-            <div class="col-md-6">
-                <div class="banner-ad bg-danger mb-3" style="background: url('images/ad-image-3.png'); background-repeat: no-repeat; background-position: right bottom; background-color: #f8f0e3; color: #4a2300;">
-                    <div class="banner-content p-5">
-                        <div class="categories text-primary fs-3 fw-bold">Premium Quality</div>
-                        <h3 class="banner-title">Finest Saffron Strands</h3>
-                        <p>Experience the richness of genuine saffron, carefully handpicked and naturally dried.</p>
-                        <a href="{{ route('products') }}" class="btn btn-dark text-uppercase">Shop Now</a>
-                    </div>
+            <div class="col-12">
+                <div class="section_title">
+                    <h2>Lorem Ipsum</h2>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="banner-ad bg-info" style="background: url('images/ad-image-4.png'); background-repeat: no-repeat; background-position: right bottom; background-color: #e8f5e9; color: #003300;">
-                    <div class="banner-content p-5">
-                        <div class="categories text-primary fs-3 fw-bold">Enhance Your Cooking</div>
-                        <h3 class="banner-title">Saffron Infusions</h3>
-                        <p>Explore the many uses of saffron in culinary delights and traditional remedies.</p>
-                        <a href="{{ route('products') }}" class="btn btn-dark text-uppercase">Learn More</a>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </div>
-</section>
-
-
-<section class="py-5">
-    <div class="container-fluid">
-
-        <div class="bg-secondary py-5 my-5 rounded-5" style="background: url('images/bg-leaves-img-pattern.png') no-repeat;">
-            <div class="container my-5">
-                <div class="row">
-                    <div class="col-md-6 p-5">
-                        <div class="section-header">
-                            <h2 class="section-title display-4">Discover the Magic of <span class="text-primary">Saffron</span> and get 25% Off</h2>
+        <div class="row">
+            <div class="blog_wrapper blog_column3 owl-carousel">
+                <div class="col-lg-4">
+                    <div class="single_blog">
+                        <div class="blog_thumb">
+                            <a href="blog-details.html"><img src="assets/img/blog/blog1.jpg" alt="Blog image post"></a>
                         </div>
-                        <p>Embark on a culinary adventure with our premium saffron. Handpicked and carefully processed, our saffron brings unparalleled flavor and vibrant color to your dishes. Subscribe now to receive 25% off your first purchase!</p>
+                        <div class="blog_content">
+                            <h3><a href="blog-details.html">Blog Image Post</a></h3>
+                            <div class="author_name">
+                                <p>
+                                    <span>by</span>
+                                    <span class="themes">admin</span>
+                                    / 30 Oct 2018
+                                </p>
+                            </div>
+                            <div class="post_desc">
+                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
+                            </div>
+                            <div class="read_more">
+                                <a href="blog-details.html">Read More</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 p-5">
-                        <form>
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text"
-                                    class="form-control form-control-lg" name="name" id="name" placeholder="Enter your name">
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Your Email</label>
-                                <input type="email" class="form-control form-control-lg" name="email" id="email" placeholder="Enter your email address">
-                            </div>
-                            <div class="form-check form-check-inline mb-3">
-                                <label class="form-check-label" for="subscribe">
-                                    <input class="form-check-input" type="checkbox" id="subscribe" value="subscribe">
-                                    Receive exclusive offers and saffron recipes!</label>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-dark btn-lg">Get Your Discount</button>
-                            </div>
-                        </form>
-
-                    </div>
-
                 </div>
-
+                <div class="col-lg-4">
+                    <div class="single_blog">
+                        <div class="blog_thumb">
+                            <a href="blog-details.html"><img src="assets/img/blog/blog2.jpg" alt="Post with Gallery"></a>
+                        </div>
+                        <div class="blog_content">
+                            <h3><a href="blog-details.html">Post with Gallery</a></h3>
+                            <div class="author_name">
+                                <p>
+                                    <span>by</span>
+                                    <span class="themes">admin</span>
+                                    / 30 Oct 2018
+                                </p>
+                            </div>
+                            <div class="post_desc">
+                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
+                            </div>
+                            <div class="read_more">
+                                <a href="blog-details.html">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="single_blog">
+                        <div class="blog_thumb">
+                            <a href="blog-details.html"><img src="assets/img/blog/blog3.jpg" alt="Post with Video"></a>
+                        </div>
+                        <div class="blog_content">
+                            <h3><a href="blog-details.html">Post with Video</a></h3>
+                            <div class="author_name">
+                                <p>
+                                    <span>by</span>
+                                    <span class="themes">admin</span>
+                                    / 30 Oct 2018
+                                </p>
+                            </div>
+                            <div class="post_desc">
+                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
+                            </div>
+                            <div class="read_more">
+                                <a href="blog-details.html">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="single_blog">
+                        <div class="blog_thumb">
+                            <a href="blog-details.html"><img src="assets/img/blog/blog2.jpg" alt="Maecenas ultricies"></a>
+                        </div>
+                        <div class="blog_content">
+                            <h3><a href="blog-details.html">Maecenas ultricies</a></h3>
+                            <div class="author_name">
+                                <p>
+                                    <span>by</span>
+                                    <span class="themes">admin</span>
+                                    / 30 Oct 2018
+                                </p>
+                            </div>
+                            <div class="post_desc">
+                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
+                            </div>
+                            <div class="read_more">
+                                <a href="blog-details.html">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
 </section>
+<!--blog section area end-->
+
+<!--Newsletter area start-->
+<div class="newsletter_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="newsletter_content">
+                    <h2>Our Newsletter</h2>
+                    <p>Get E-mail updates about our latest shop and special offers.</p>
+                    <div class="subscribe_form">
+                        <form id="mc-form" class="mc-form footer-newsletter">
+                            <input id="mc-email" type="email" autocomplete="off" placeholder="Email address..." />
+                            <button id="mc-submit" type="submit">Subscribe</button>
+                        </form>
+                        <!-- mailchimp-alerts Start -->
+                        <div class="mailchimp-alerts text-center">
+                            <div class="mailchimp-submitting"></div><!-- mailchimp-submitting end -->
+                            <div class="mailchimp-success"></div><!-- mailchimp-success end -->
+                            <div class="mailchimp-error"></div><!-- mailchimp-error end -->
+                        </div><!-- mailchimp-alerts end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Newsletter area start-->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".add-to-cart-btn").forEach(function(button) {
-            button.addEventListener("click", function() {
-                let productId = this.getAttribute("data-id");
 
-                fetch("/cart/add", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                        },
-                        body: JSON.stringify({
-                            id: productId,
-                            quantity: 1
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("Product added to cart!");
-                        } else {
-                            alert("Failed to add to cart");
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-            });
-        });
-    });
-</script>
 
 
 @include('layout.footer')
+apps-fileview.texmex_20250313.01_p0
+welcome.blade.php
+Displaying welcome.blade.php.

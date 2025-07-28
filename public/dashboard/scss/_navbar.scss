@@ -353,7 +353,7 @@
     }
   }
   .navbar-collapse {
-    display: flex;
+    display: flex !important;
     margin-top: 0.5rem;
   }
 }

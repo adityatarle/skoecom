@@ -1,50 +1,30 @@
-<div class="row">
-    @foreach($products as $product)
-        <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="single_product">
-                <div class="product_thumb">
-                    <a class="primary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt=""></a>
-                    <a class="secondary_img" href="{{ route('product.details', $product->id) }}"><img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt=""></a>
-                    <div class="quick_button">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box" data-placement="top" data-original-title="quick view"> quick view</a>
-                    </div>
-                </div>
-                <div class="product_content">
-                    <div class="tag_cate">
-                        @if ($product->category)
-                            <a href="{{ route('products', ['category' => $product->category->name]) }}">{{ $product->category->name }}</a>
-                        @endif
-                    </div>
-                    <h3><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></h3>
-                    <div class="price_box">
-                        @if($product->old_price)
-                            <span class="old_price">${{ $product->old_price }}</span>
-                        @endif
-                        <span class="current_price">${{ $product->price }}</span>
-                    </div>
-                    <div class="product_hover">
-                        <div class="product_ratings">
-                            <ul>
-                                <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
-                                <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
-                                <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
-                                <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
-                                <li><a href="#"><i class="ion-ios-star-outline"></i></a></li>
-                            </ul>
-                        </div>
-                        <!-- <div class="product_desc">
-                            <p>{!! $product->description !!}</p>
-                        </div> -->
-                        <div class="action_links">
-                            <ul>
-                                <li><a href="wishlist.html" data-placement="top" title="Add to Wishlist" data-bs-toggle="tooltip"><span class="icon icon-Heart"></span></a></li>
-                                <li class="add_to_cart"><a href="cart.html" title="add to cart">add to cart</a></li>
-                                <li><a href="compare.html" title="compare"><i class="ion-ios-settings-strong"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+<!-- partials/product_grid.blade.php  29-3-25 -->
+@foreach($products as $product)
+<div class="col">
+    <div class="jewelry-product">
+        <div class="product-thumb">
+            <a href="{{ route('product.details', $product->id) }}">
+                <img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt="{{ $product->name }}" class="primary-img">
+                <img src="{{ $product->images->count() > 1 ? asset($product->images[1]->image_path) : ($product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png')) }}" alt="{{ $product->name }}" class="hover-img">
+            </a>
+            <div class="quick-view">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box">Quick View</a>
+            </div>
+            <div class="shine-effect"></div>
+        </div>
+        <div class="product-info">
+            <h3><a href="{{ route('product.details', $product->id) }}">{{ $product->name }}</a></h3>
+            <div class="price-box">
+                @if($product->old_price)
+                <span class="old-price">₹{{ number_format($product->old_price, 2) }}</span>
+                @endif
+                <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
+            </div>
+            <div class="action-links">
+                <a href="{{ route('wishlist.add', $product->id) }}" class="add_to_wishlist" data-id="{{ $product->id }}" title="Add to Wishlist"><i class="icon ion-ios-heart-outline"></i></a>
+                <a href="{{ route('cart.add', $product->id) }}" class="add_to_cart1" data-id="{{ $product->id }}" title="Add to Cart"><i class="icon ion-bag"></i></a>
             </div>
         </div>
-    @endforeach
+    </div>
 </div>
+@endforeach

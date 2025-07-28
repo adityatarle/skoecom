@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
             $table->unsignedBigInteger('sub_category_id')->nullable()->after('category_id');
-            $table->foreign('sub_category_id')->references('id')->on('product_categories')->onDelete('set null');
+            $table->foreign('sub_category_id')->references('id')->on('subcategories')->onDelete('set null'); // ✅ Correct table
         });
     }
 
@@ -24,5 +21,4 @@ return new class extends Migration
             $table->dropColumn('sub_category_id');
         });
     }
-
 };

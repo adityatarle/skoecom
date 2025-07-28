@@ -19,7 +19,7 @@
             <select name="category_id" id="category_id" class="form-control" required>
                 <option value="">Select Category</option>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -122,13 +122,22 @@
 
 <!-- JavaScript for Category-Subcategory Filtering -->
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         $('#description').summernote({
             height: 300,
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                // ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['table', ['table']], // Include the table plugin
+            ]
         });
 
         let imageCount = 1;
-        $('#add-image').click(function () {
+        $('#add-image').click(function() {
             if (imageCount < 5) {
                 $('#image-container').append(`
                     <div class="mb-3 input-group image-input">
@@ -147,7 +156,7 @@
             }
         });
 
-        $('#image-container').on('click', '.remove-image', function () {
+        $('#image-container').on('click', '.remove-image', function() {
             $(this).closest('.image-input').remove();
             imageCount--;
 
@@ -158,65 +167,96 @@
 
         let cropper = null;
 
-        $('#image-container').on('change', '.image-upload', function (e) {
+        $('#image-container').on('change', '.image-upload', function(e) {
             let currentInput = $(this);
             let currentPreview = $(this).siblings('.image-preview-container').find('.image-preview');
             let file = e.target.files[0];
 
             if (file) {
+                console.log('Original file size:', file.size, 'Type:', file.type); // Debug original file
+
                 let reader = new FileReader();
-                reader.onload = function (event) {
+                reader.onload = function(event) {
                     $('#modal-image-preview').attr('src', event.target.result);
                     $('#cropModal').modal('show');
                 };
                 reader.readAsDataURL(file);
 
-                $('#cropModal').off('shown.bs.modal').on('shown.bs.modal', function () {
+                $('#cropModal').off('shown.bs.modal').on('shown.bs.modal', function() {
                     let modalImage = $('#modal-image-preview');
 
                     if (cropper) {
                         cropper.destroy();
                     }
 
+                    // Initialize Cropper with minimal processing
                     cropper = new Cropper(modalImage[0], {
                         aspectRatio: 1,
                         viewMode: 1,
-                        crop(event) {},
+                        autoCropArea: 1, // Use full image area initially
+                        scalable: false, // Prevent scaling
+                        zoomable: false, // Prevent zooming
+                        movable: true,
+                        crop(event) {
+                            // Log crop data for debugging
+                            console.log('Crop data:', event.detail);
+                        },
                     });
                 });
 
-                $('#cropModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+                $('#cropModal').off('hidden.bs.modal').on('hidden.bs.modal', function() {
                     if (cropper) {
                         cropper.destroy();
                         cropper = null;
                     }
                 });
 
-                $('#modal-crop-button').off('click').on('click', function () {
+                $('#modal-crop-button').off('click').on('click', function() {
+                    // Get crop data
+                    let cropData = cropper.getData();
+                    console.log('Crop dimensions:', Math.round(cropData.width), 'x', Math.round(cropData.height));
+
+                    // Create canvas with natural dimensions
                     let croppedCanvas = cropper.getCroppedCanvas({
-                        width: 200,
-                        height: 200,
+                        width: Math.round(cropData.width),
+                        height: Math.round(cropData.height),
+                        imageSmoothingEnabled: true,
+                        imageSmoothingQuality: 'high',
+                        fillColor: '#fff', // Ensure no transparent background
                     });
 
-                    croppedCanvas.toBlob(function (blob) {
-                        let file = new File([blob], "cropped_image.jpg", { type: "image/jpeg" });
-                        let container = new DataTransfer();
-                        container.items.add(file);
-                        currentInput[0].files = container.files;
+                    // Debug canvas output
+                    let canvasDataURL = croppedCanvas.toDataURL('image/jpeg', 1.0);
+                    console.log('Canvas Data URL:', canvasDataURL);
 
-                        let previewReader = new FileReader();
-                        previewReader.onload = function (event) {
-                            currentPreview.attr('src', event.target.result).parent().show();
-                            $('#cropModal').modal('hide');
-                        };
-                        previewReader.readAsDataURL(file);
-                    });
+                    croppedCanvas.toBlob(
+                        function(blob) {
+                            console.log('Cropped blob size:', blob.size); // Debug blob size
+
+                            let file = new File([blob], "cropped_image.jpg", {
+                                type: "image/jpeg"
+                            });
+                            let container = new DataTransfer();
+                            container.items.add(file);
+                            currentInput[0].files = container.files;
+
+                            let previewReader = new FileReader();
+                            previewReader.onload = function(event) {
+                                currentPreview.attr('src', event.target.result).parent().show();
+                                console.log('Preview Data URL:', event.target.result); // Debug preview
+                                $('#cropModal').modal('hide');
+                            };
+                            previewReader.readAsDataURL(file);
+                        },
+                        'image/jpeg',
+                        1.0 // 100% quality
+                    );
                 });
             }
         });
 
         // Fetch subcategories when category is selected
-        $('#category_id').change(function () {
+        $('#category_id').change(function() {
             let categoryId = $(this).val();
             $('#sub_category_id').html('<option value="">Select Subcategory</option>'); // Reset subcategory
 
@@ -224,9 +264,11 @@
                 $.ajax({
                     url: '{{ route("admin.subcategory.getByCategory") }}',
                     type: 'GET',
-                    data: { category_id: categoryId },
-                    success: function (data) {
-                        $.each(data, function (key, value) {
+                    data: {
+                        category_id: categoryId
+                    },
+                    success: function(data) {
+                        $.each(data, function(key, value) {
                             $('#sub_category_id').append('<option value="' + value.id + '">' + value.name + '</option>');
                         });
                     }
@@ -237,10 +279,10 @@
 </script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         let pricingIndex = 1;
 
-        $('#add-pricing').click(function () {
+        $('#add-pricing').click(function() {
             $('#pricing-container').append(`
                 <div class="mb-2 row pricing-item">
                     <div class="col-md-3">
@@ -263,7 +305,7 @@
             pricingIndex++;
         });
 
-        $(document).on('click', '.remove-pricing', function () {
+        $(document).on('click', '.remove-pricing', function() {
             $(this).closest('.pricing-item').remove();
         });
     });

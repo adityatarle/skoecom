@@ -38,7 +38,23 @@
     data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" class="app-default">
     <!--begin::Theme mode setup on page load-->
     <script>
-        var defaultThemeMode = "dark"; var themeMode; if (document.documentElement) { if (document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if (localStorage.getItem("data-bs-theme") !== null) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }
+        var defaultThemeMode = "dark";
+        var themeMode;
+        if (document.documentElement) {
+            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
+                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
+            } else {
+                if (localStorage.getItem("data-bs-theme") !== null) {
+                    themeMode = localStorage.getItem("data-bs-theme");
+                } else {
+                    themeMode = defaultThemeMode;
+                }
+            }
+            if (themeMode === "system") {
+                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-bs-theme", themeMode);
+        }
     </script>
     <!--end::Theme mode setup on page load-->
     <!--begin::App-->
@@ -66,7 +82,7 @@
                     <!--begin::Mobile logo-->
                     <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
                         <a href="#" class="d-lg-none">
-                            <h3 class="mb-0 text-white app-sidebar-logo-default card-title">Preona</h3>
+                            <h3 class="mb-0 text-white app-sidebar-logo-default card-title">SK Ornaments</h3>
                         </a>
                     </div>
                     <!--end::Mobile logo-->
@@ -249,8 +265,8 @@
                     <div class="px-6 app-sidebar-logo" id="kt_app_sidebar_logo">
                         <!--begin::Logo image-->
                         <a href="#">
-                            <h3 class="mb-0 text-white app-sidebar-logo-default card-title">Preona</h3>
-                            <h4 class="mb-0 text-white app-sidebar-logo-minimize card-title">Preona</h4>
+                            <h3 class="mb-0 text-white app-sidebar-logo-default card-title">SK Ornaments</h3>
+                            <h4 class="mb-0 text-white app-sidebar-logo-minimize card-title">SK Ornaments</h4>
                         </a>
                         <!--end::Logo image-->
                         <!--begin::Sidebar toggle-->
@@ -396,51 +412,43 @@
                                         </div>
                                     </div>
 
+
+                                     <!-- Orders Section -->
+                <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.orders.*') ? 'show' : '' }}">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-basket fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                                <span class="path4"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Orders</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+                    <div class="menu-sub menu-sub-accordion menu-active-bg">
+                        <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">All Orders</span>
+                            </a>
+                        </div>
+                        <!-- <div class="menu-item">
+                            <a class="menu-link {{ request()->routeIs('admin.orders.export') ? 'active' : '' }}" href="{{ route('admin.orders.export') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">Export Orders</span>
+                            </a>
+                        </div> -->
+                    </div>
+                </div>
+
                                     <!-- Inquiries Section -->
-                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.products.inquiries') ? 'show' : '' }}">
-                                        <span class="menu-link">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-file fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Inquiries</span>
-                                            <span class="menu-arrow"></span>
-                                        </span>
-                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
-                                            <div class="menu-item">
-                                                <a class="menu-link {{ request()->routeIs('admin.product.inquiries') ? 'active' : '' }}" href="{{ route('admin.product.inquiries') }}">
-                                                    <span class="menu-bullet">
-                                                        <span class="bullet bullet-dot"></span>
-                                                    </span>
-                                                    <span class="menu-title">View Inquiries</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.reviews.*') ? 'show' : '' }}">
-                                        <span class="menu-link">
-                                            <span class="menu-icon">
-                                                <i class="ki-duotone ki-file fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                </i>
-                                            </span>
-                                            <span class="menu-title">Reviews</span>
-                                            <span class="menu-arrow"></span>
-                                        </span>
-                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
-                                            <div class="menu-item">
-                                                <a class="menu-link {{ request()->routeIs('admin.reviews.index') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
-                                                    <span class="menu-bullet">
-                                                        <span class="bullet bullet-dot"></span>
-                                                    </span>
-                                                    <span class="menu-title">View Reviews</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                                 <!--end::Scroll wrapper-->
                             </div>

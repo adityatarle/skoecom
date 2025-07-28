@@ -151,4 +151,17 @@ class MainpageController extends Controller
             'categories' => $categories,
         ]);
     }
-}
+
+
+    public function contactform() {
+
+        return view('contact');
+    }
+
+    public function contactstore() {
+
+        return view('contact');
+    }
+
+    }
+

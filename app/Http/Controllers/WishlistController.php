@@ -45,7 +45,7 @@ class WishlistController extends Controller
     public function getWishlistCount()
     {
         return response()->json([
-            'wishlist_count' => Auth::check() 
+            'wishlist_count' => Auth::check()
                 ? Wishlist::where('user_id', Auth::id())->count()
                 : (session('wishlist') ? count(session('wishlist')) : 0)
         ]);
@@ -54,29 +54,29 @@ class WishlistController extends Controller
 
     public function remove(Request $request, $productId)
     {
-       if (Auth::check()) {
-             Wishlist::where('user_id', Auth::id())
-               ->where('product_id', $productId)
-               ->delete();
+        if (Auth::check()) {
+            Wishlist::where('user_id', Auth::id())
+                ->where('product_id', $productId)
+                ->delete();
 
-             return back()->with('success', 'Product removed from your wishlist!');
-       } else {
-           $wishlist = session()->get('wishlist', []);
+            return back()->with('success', 'Product removed from your wishlist!');
+        } else {
+            $wishlist = session()->get('wishlist', []);
             if (isset($wishlist[$productId])) {
-               unset($wishlist[$productId]);
-               session()->put('wishlist', $wishlist);
+                unset($wishlist[$productId]);
+                session()->put('wishlist', $wishlist);
             }
             return back()->with('success', 'Product removed from your wishlist!');
-       }
+        }
     }
     public function index()
     {
-         if (Auth::check()) {
+        if (Auth::check()) {
             $wishlistItems = Wishlist::where('user_id', Auth::id())->with('product')->get();
-         } else {
-             $wishlistItems = session()->get('wishlist', []);
-         }
-         return view('cart.wishlist', compact('wishlistItems'));
+        } else {
+            $wishlistItems = session()->get('wishlist', []);
+        }
+        return view('cart.wishlist', compact('wishlistItems'));
     }
 
     public function addToWishlist(Request $request)
@@ -127,5 +127,4 @@ class WishlistController extends Controller
             'wishlist_count' => $wishlistCount,
         ]);
     }
-
 }

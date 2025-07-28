@@ -13,13 +13,24 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\OrdersController;
 
 use App\Http\Controllers\AdminController; //Import if you use admin index page
+
+
+
+
+Route::get('/razorpay-create-order', [RazorpayController::class, 'createOrder'])->name('razorpay.createOrder');
+Route::get('/payment-success', [RazorpayController::class, 'paymentSuccess'])->name('payment.success');
+Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.placeOrder');
 
 
 // Public Routes
 Route::get('/home', [MainpageController::class, 'index'])->name('home');
 Route::get('/products', [MainpageController::class, 'products'])->name('products');
+Route::get('/contact', [MainpageController::class, 'contactform'])->name('contact');
+Route::get('/contact', [MainpageController::class, 'contactstore'])->name('contact.store');
 Route::get('/product/{product}', [MainpageController::class, 'productDetails'])->name('product.details');
 Route::get('/', [MainpageController::class, 'index'])->name('main.page');
 Route::post('/product/inquiry', [ProductController::class, 'storeInquiry'])->name('product.inquiry');
@@ -128,6 +139,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('admin.reviews.edit');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('admin.reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+
+
+
+    Route::get('/orders', [OrdersController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}', [OrdersController::class, 'show'])->name('admin.orders.show');
+    Route::delete('/orders/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
+    Route::post('/orders/{id}/status', [OrdersController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::get('/orders/export', [OrdersController::class, 'export'])->name('admin.orders.export');
 
 
 

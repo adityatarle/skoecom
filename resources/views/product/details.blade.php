@@ -1,5 +1,91 @@
 @include('layout.header')
 
+<style>
+    .product_details {
+        padding: 2rem 0;
+    }
+
+    .product-details-tab {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .product_d_right {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #dee2e6;
+        height: 100%;
+    }
+
+    .product_d_right h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 0.5rem;
+    }
+
+    .product_d_right p {
+        font-size: 0.95rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    .product_price {
+        margin: 1rem 0;
+    }
+
+    .current_price {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #000000;
+    }
+
+    .accordion-item {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+    .accordion-button {
+        background: linear-gradient(125deg, #b89f7e 10%, #f0ebe7 100%);
+        font-weight: 500;
+        color: #ffffff;
+        border-radius: 4px;
+        padding: 1rem;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(125deg, #f0ebe7 10%, #b89f7e 100%);
+        color: #000000;
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: #dee2e6;
+    }
+
+    .accordion-body {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 1rem;
+    }
+
+    .table {
+        font-size: 0.9rem;
+        color: #000000;
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem;
+        vertical-align: middle;
+    }
+</style>
+
 <!--breadcrumbs area start-->
 <div class="breadcrumbs_area product_bread bg-white">
     <div class="container">
@@ -7,11 +93,7 @@
             <div class="col-12">
                 <div class="breadcrumb_content">
                     <ul>
-                        <li><a href="index.html">home</a></li>
-                        <li>></li>
-                        <li><a href="shop.html">shop</a></li>
-                        <li>></li>
-                        <li><a href="shop.html">Clothing</a></li>
+                        <li><a href="{{route('home')}}">home</a></li>
                         <li>></li>
                         <li>product details</li>
                     </ul>
@@ -22,25 +104,22 @@
 </div>
 <!--breadcrumbs area end-->
 
-<!--product details start-->
-<div class="product_details">
+<!-- Product Details Start -->
+<div class="product_details mt-4">
     <div class="container">
         <div class="row">
             <!-- Product Image Section -->
-            <div class="mb-4 col-lg-6 col-md-6 mb-md-0">
+            <div class="col-lg-6 col-md-6 mb-4">
                 <div class="product-details-tab">
-                    <div id="img-1" class="zoomWrapper single-zoom">
-                        <a href="#">
-                            @if($product->images->isNotEmpty())
-                            <img id="zoom1"
-                                src="{{ asset($product->images->first()->image_path) }}"
-                                data-zoom-image="{{ asset($product->images->first()->image_path) }}"
-                                alt="{{ $product->name }}"
-                                style="width: 100%; height: auto; display: block;">
-                            @else
-                            <p>No image available</p>
-                            @endif
-                        </a>
+                    <div class="single-zoom">
+                        @if($product->images->isNotEmpty())
+                        <img id="main-image"
+                            src="{{ asset($product->images->first()->image_path) }}"
+                            alt="{{ $product->name }}"
+                            style="width: 100%; height: auto; display: block;">
+                        @else
+                        <p>No image available</p>
+                        @endif
                     </div>
 
                     <!-- Thumbnail Carousel -->
@@ -48,11 +127,10 @@
                         <ul class="s-tab-zoom owl-carousel single-product-active" id="gallery_01">
                             @foreach ($product->images as $image)
                             <li>
-                                <a href="#" class="elevatezoom-gallery"
+                                <img class="product-thumbnail"
+                                    src="{{ asset($image->image_path) }}"
                                     data-image="{{ asset($image->image_path) }}"
-                                    data-zoom-image="{{ asset($image->image_path) }}">
-                                    <img src="{{ asset($image->image_path) }}" alt="{{ $product->name }}" />
-                                </a>
+                                    alt="{{ $product->name }}" />
                             </li>
                             @endforeach
                         </ul>
@@ -73,37 +151,22 @@
                             <p>(Inclusive of all taxes)</p>
                         </div>
 
-                        <div class="pb-4">
+                        <div class="pb-3">
                             <p class="fw-bold mb-0">Product Description:</p>
                             <p>{!! $product->description !!}</p>
                         </div>
 
                         <!-- Bootstrap Accordion -->
                         <div class="accordion" id="productDetailsAccordion">
-
-                            <!-- Product Details -->
-                            <!-- <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                        Product Details
-                                    </button>
-                                </h2>
-                                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#productDetailsAccordion">
-                                    <div class="accordion-body">
-                                        <p>{!! $product->description !!}</p>
-                                    </div>
-                                </div>
-                            </div> -->
-
                             <!-- Product Break Up Price -->
                             <div class="accordion-item">
-                                <h2 class="accordion-header">
+                                <h2 class="accordion-header" id="headingTwo">
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                         Product Break Up Price
                                     </button>
                                 </h2>
-                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#productDetailsAccordion">
-                                    <div class="accordion-body bg-light m-4">
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#productDetailsAccordion">
+                                    <div class="accordion-body bg-light">
                                         <p class="fw-bold">Ocean’s Whisper Diamond Bangle is crafted in 18KT White Gold and is studded with Diamonds and Pearls.</p>
                                         <table class="table">
                                             <thead>
@@ -152,38 +215,48 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Shipping Status -->
-                            <!-- <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                        Shipping Status
-                                    </button>
-                                </h2>
-                                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#productDetailsAccordion">
-                                    <div class="accordion-body">
-                                        <p><strong>Free Shipping In India.</strong></p>
-                                        <p>We will ship the product in <strong>7 to 10 days</strong>.</p>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="mt-4">
-                            <button class="btn btn-dark">Add to Cart</button>
-                            <button class="btn btn-outline-dark">Buy Now</button>
+                        <div class="mt-3 d-flex gap-2">
+                            <button class="btn btn-dark add_to_cart1" data-id="{{ $product->id }}">Add to Cart</button>
+                            <!--<button class="btn btn-outline-dark">Buy Now</button>-->
                         </div>
-
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!--product details end-->
+<!-- Product Details End -->
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Thumbnail Image Switcher Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mainImage = document.getElementById("main-image");
+        const thumbnails = document.querySelectorAll(".product-thumbnail");
+
+        if (!mainImage || thumbnails.length === 0) {
+            console.error("Main image or thumbnails not found!");
+            return;
+        }
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener("click", function() {
+                let newImageSrc = this.getAttribute("data-image");
+                if (newImageSrc) {
+                    mainImage.src = newImageSrc;
+                }
+            });
+
+            thumbnail.addEventListener("mouseover", function() {
+                let newImageSrc = this.getAttribute("data-image");
+                if (newImageSrc) {
+                    mainImage.src = newImageSrc;
+                }
+            });
+        });
+    });
+</script>
 
 @include('layout.footer')
