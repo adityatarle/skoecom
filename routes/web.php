@@ -62,6 +62,26 @@ Route::get('/razorpay-create-order', [RazorpayController::class, 'createOrder'])
 Route::post('/payment-success', [RazorpayController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/test-razorpay', [RazorpayController::class, 'testConfig'])->name('razorpay.test');
 
+// Debug route for configuration (remove in production)
+Route::get('/debug/config', function() {
+    if (!env('APP_DEBUG', false)) {
+        abort(404);
+    }
+    
+    $config = [
+        'app_debug' => env('APP_DEBUG', false),
+        'razorpay_key_exists' => !empty(env('RAZORPAY_KEY')),
+        'razorpay_secret_exists' => !empty(env('RAZORPAY_SECRET')),
+        'razorpay_key_value' => env('RAZORPAY_KEY'),
+        'is_placeholder_key' => env('RAZORPAY_KEY') === 'rzp_test_your_key_here',
+        'is_placeholder_secret' => env('RAZORPAY_SECRET') === 'your_secret_here',
+        'cart_session' => session('cart', []),
+        'cart_count' => count(session('cart', [])),
+    ];
+    
+    return response()->json($config, 200, [], JSON_PRETTY_PRINT);
+})->name('debug.config');
+
 // Order Routes (Requires authentication for viewing orders)
 Route::middleware(['auth'])->group(function () {
     Route::get('/orders', [CheckoutController::class, 'index'])->name('orders.index');
