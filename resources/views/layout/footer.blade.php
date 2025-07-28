@@ -217,58 +217,160 @@
 <script>
     $(document).ready(function() {
         // Add to Cart
-        $(".add_to_cart1").click(function(e) {
+        $(document).on('click', '.add_to_cart1', function(e) {
             e.preventDefault();
             var productId = $(this).data("id");
+            var button = $(this);
+            var originalText = button.text();
+            
+            // Disable button and show loading state
+            button.prop('disabled', true).text('Adding...');
 
             $.ajax({
                 url: "{{ route('cart.add') }}",
                 type: "POST",
                 data: {
                     product_id: productId,
-                    _token: "{{ csrf_token() }}" // Ensure CSRF token is sent
+                    _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
                     if (response.status === "success") {
-                        alert(response.message);
-                        $("#cart_count").text(response.cart_count);
+                        // Show success message
+                        showNotification(response.message, 'success');
+                        
+                        // Update cart count in header
+                        updateCartCount(response.cart_count);
+                        
+                        // Show button feedback
+                        button.text('Added!').removeClass('btn-dark').addClass('btn-success');
+                        setTimeout(function() {
+                            button.text(originalText).removeClass('btn-success').addClass('btn-dark');
+                        }, 2000);
                     } else {
-                        alert(response.message);
+                        showNotification(response.message, 'error');
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    alert("Error adding to cart");
+                    console.error('Cart Error:', xhr.responseText);
+                    showNotification("Error adding to cart", 'error');
+                },
+                complete: function() {
+                    button.prop('disabled', false);
+                    if (button.text() === 'Adding...') {
+                        button.text(originalText);
+                    }
                 }
             });
         });
 
         // Add to Wishlist
-        $(".add_to_wishlist").click(function(e) {
+        $(document).on('click', '.add_to_wishlist', function(e) {
             e.preventDefault();
             var productId = $(this).data("id");
+            var button = $(this);
+            var icon = button.find('i');
 
             $.ajax({
                 url: "{{ route('wishlist.add') }}",
                 type: "POST",
                 data: {
                     product_id: productId,
-                    _token: "{{ csrf_token() }}" // Ensure CSRF token is included
+                    _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
-                    if (response.status === "success" || response.status === "info") {
-                        alert(response.message);
-                        $("#wishlist_count").text(response.wishlist_count); // Update count
+                    if (response.status === "success") {
+                        showNotification(response.message, 'success');
+                        updateWishlistCount(response.wishlist_count);
+                        
+                        // Update icon to show added state
+                        if (icon.length) {
+                            icon.removeClass('fa-heart-o').addClass('fa-heart').css('color', '#e74c3c');
+                        }
+                        button.addClass('in-wishlist');
+                    } else if (response.status === "info") {
+                        showNotification(response.message, 'info');
                     } else {
-                        alert(response.message);
+                        showNotification(response.message, 'error');
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    alert("Error adding to wishlist");
+                    console.error('Wishlist Error:', xhr.responseText);
+                    showNotification("Error adding to wishlist", 'error');
                 }
             });
         });
+
+        // Helper function to update cart count
+        function updateCartCount(count) {
+            var cartCountElements = $('#cart_count, .cart-count, [data-cart-count]');
+            cartCountElements.text(count);
+            
+            // Animate the count update
+            cartCountElements.animate({
+                fontSize: '1.2em'
+            }, 200).animate({
+                fontSize: '1em'
+            }, 200);
+        }
+
+        // Helper function to update wishlist count
+        function updateWishlistCount(count) {
+            var wishlistCountElements = $('#wishlist_count, .wishlist-count, [data-wishlist-count]');
+            wishlistCountElements.text(count);
+            
+            // Animate the count update
+            wishlistCountElements.animate({
+                fontSize: '1.2em'
+            }, 200).animate({
+                fontSize: '1em'
+            }, 200);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            $('.notification').remove();
+            
+            var notificationClass = 'alert-info';
+            if (type === 'success') notificationClass = 'alert-success';
+            if (type === 'error') notificationClass = 'alert-danger';
+            if (type === 'warning') notificationClass = 'alert-warning';
+            
+            var notification = $(`
+                <div class="notification alert ${notificationClass} alert-dismissible fade show" 
+                     style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+            
+            $('body').append(notification);
+            
+            // Auto hide after 4 seconds
+            setTimeout(function() {
+                notification.alert('close');
+            }, 4000);
+        }
+
+        // Load initial counts on page load
+        loadCartCount();
+        loadWishlistCount();
+
+        function loadCartCount() {
+            $.get("{{ route('cart.count') }}", function(response) {
+                updateCartCount(response.cart_count);
+            }).fail(function() {
+                console.log('Failed to load cart count');
+            });
+        }
+
+        function loadWishlistCount() {
+            $.get("{{ route('wishlist.count') }}", function(response) {
+                updateWishlistCount(response.wishlist_count);
+            }).fail(function() {
+                console.log('Failed to load wishlist count');
+            });
+        }
     });
 </script>
 
