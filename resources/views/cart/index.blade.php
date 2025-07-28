@@ -332,9 +332,9 @@
                                     @php $subtotal = $details['quantity'] * $details['price']; $total += $subtotal; @endphp
                                     <tr class="cart-item-row jewel-row" id="cart-row-{{ $id }}" data-id="{{ $id }}">
                                         <td class="product_remove">
-                                            <a href="{{ route('cart.remove', $id) }}" class="remove-btn ajax-cart-remove jewel-remove-btn" data-id="{{ $id }}" title="Remove Item">
+                                            <button type="button" class="remove-btn ajax-cart-remove jewel-remove-btn" data-id="{{ $id }}" title="Remove Item" style="background: none; border: none; color: #b89f7e; font-size: 1.2rem;">
                                                 <i class="fa fa-times"></i>
-                                            </a>
+                                            </button>
                                         </td>
                                         <td class="product_thumb1">
                                             <a href="{{ route('product.details', $id) }}">
@@ -352,9 +352,9 @@
                                         <td class="product-price">₹{{ number_format($details['price'], 2) }}</td>
                                         <td class="product_quantity">
                                             <div class="quantity-control jewel-quantity">
-                                                <a href="{{ route('cart.decrease', $id) }}" class="qty-btn ajax-cart-decrease jewel-qty-btn" data-id="{{ $id }}">-</a>
+                                                <button type="button" class="qty-btn ajax-cart-decrease jewel-qty-btn" data-id="{{ $id }}" style="background: #b89f7e; color: #fff; border: none; border-radius: 50%; width: 25px; height: 25px;">-</button>
                                                 <input min="1" max="100" value="{{ $details['quantity'] }}" type="number" class="qty-input cart-item-qty-input jewel-input" data-id="{{ $id }}" name="quantities[{{ $id }}]">
-                                                <a href="{{ route('cart.increase', $id) }}" class="qty-btn ajax-cart-increase jewel-qty-btn" data-id="{{ $id }}">+</a>
+                                                <button type="button" class="qty-btn ajax-cart-increase jewel-qty-btn" data-id="{{ $id }}" style="background: #b89f7e; color: #fff; border: none; border-radius: 50%; width: 25px; height: 25px;">+</button>
                                             </div>
                                         </td>
                                         <td class="product_total cart-item-subtotal">₹{{ number_format($subtotal, 2) }}</td>
@@ -423,16 +423,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    
     const cartTbody = document.getElementById('cart-tbody');
     const cartFeedback = document.getElementById('cart-feedback');
     const cartContainer = document.querySelector('.cart-container');
-    const emptyCartMessage = document.getElementById('empty-cart-message');
-    const cartTableContainer = document.getElementById('cart-table-container');
-    const cartSummaryContainer = document.getElementById('cart-summary-container');
 
     function showFeedback(message, isSuccess = true) {
         cartFeedback.textContent = message;
-        cartFeedback.className = isSuccess ? 'success' : 'error';
+        cartFeedback.className = `jewel-feedback ${isSuccess ? 'success' : 'error'}`;
         cartFeedback.style.display = 'block';
         setTimeout(() => {
             cartFeedback.style.display = 'none';
@@ -454,6 +454,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function makeCartRequest(url, method, productId) {
+        const formData = new FormData();
+        if (method === 'POST') {
+            if (url.includes('update')) {
+                formData.append('product_id', productId);
+                if (url.includes('increase')) {
+                    formData.append('action', 'increase');
+                } else if (url.includes('decrease')) {
+                    formData.append('action', 'decrease');
+                }
+            }
+        }
+        
+        if (csrfToken) {
+            formData.append('_token', csrfToken);
+        }
+        
+        if (method === 'DELETE' && csrfToken) {
+            formData.append('_method', 'DELETE');
+        } else if (method === 'PATCH' && csrfToken) {
+            formData.append('_method', 'PATCH');
+        }
+
+        return fetch(url, {
+            method: method === 'DELETE' || method === 'PATCH' ? 'POST' : method,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            body: formData
+        });
+    }
+
     if (cartTbody) {
         cartTbody.addEventListener('click', function(event) {
             const target = event.target;
@@ -463,26 +496,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
             event.preventDefault();
 
-            const url = button.getAttribute('href');
             const productId = button.dataset.id;
             const row = document.getElementById(`cart-row-${productId}`);
             const summary = document.querySelector('.cart-summary-section');
 
-            if (!url || !productId || !row) {
-                console.error('Missing URL, Product ID or Row Element');
+            if (!productId || !row) {
+                console.error('Missing Product ID or Row Element');
                 showFeedback('Could not update cart. Please try again.', false);
                 return;
+            }
+
+            let url, method;
+            
+            if (button.classList.contains('ajax-cart-remove')) {
+                url = `/cart/remove/${productId}`;
+                method = 'DELETE';
+            } else if (button.classList.contains('ajax-cart-increase')) {
+                url = '/cart/update';
+                method = 'POST';
+            } else if (button.classList.contains('ajax-cart-decrease')) {
+                url = '/cart/update';
+                method = 'POST';
             }
 
             row.classList.add('is-loading');
             if (summary) summary.classList.add('is-loading');
 
+            // Determine the action for update requests
+            let action = '';
+            if (button.classList.contains('ajax-cart-increase')) {
+                action = 'increase';
+            } else if (button.classList.contains('ajax-cart-decrease')) {
+                action = 'decrease';
+            }
+
+            const requestData = new FormData();
+            if (csrfToken) requestData.append('_token', csrfToken);
+            
+            if (method === 'DELETE') {
+                requestData.append('_method', 'DELETE');
+                method = 'POST'; // Laravel uses POST with _method override
+            } else if (url.includes('update')) {
+                requestData.append('product_id', productId);
+                requestData.append('action', action);
+            }
+
             fetch(url, {
-                method: 'GET',
+                method: method,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
-                }
+                },
+                body: requestData
             })
             .then(response => {
                 if (!response.ok) {
@@ -524,57 +589,68 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const applyCouponBtn = document.getElementById('apply-coupon-btn');
+    // Coupon functionality
+    const couponButtons = document.querySelectorAll('.jewel-btn');
     const couponInput = document.getElementById('coupon-code-input');
     const couponFeedback = document.getElementById('coupon-feedback');
 
-    if (applyCouponBtn && couponInput && couponFeedback) {
-        applyCouponBtn.addEventListener('click', function() {
-            const code = couponInput.value.trim();
-            if (!code) {
-                couponFeedback.textContent = 'Please enter a coupon code.';
-                couponFeedback.style.color = 'red';
-                return;
-            }
-
-            couponFeedback.textContent = 'Applying...';
-            couponFeedback.style.color = '#666';
-            applyCouponBtn.disabled = true;
-
-            const couponUrl = '/validate-coupon'; // Replace with actual endpoint
-
-            fetch(couponUrl, {
-                method: 'POST',
-                body: JSON.stringify({ coupon_code: code }),
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    couponFeedback.textContent = data.message || 'Coupon applied successfully!';
-                    couponFeedback.style.color = 'green';
-                    if (data.cartTotalFormatted) {
-                        updateCartTotals(data.cartSubtotalFormatted || data.cartTotalFormatted, data.cartTotalFormatted);
+    couponButtons.forEach(button => {
+        if (button.textContent.trim() === 'Apply') {
+            button.addEventListener('click', function() {
+                const code = couponInput?.value.trim();
+                if (!code) {
+                    if (couponFeedback) {
+                        couponFeedback.textContent = 'Please enter a coupon code.';
+                        couponFeedback.style.color = 'red';
                     }
-                } else {
-                    couponFeedback.textContent = data.message || 'Invalid coupon code.';
-                    couponFeedback.style.color = 'red';
+                    return;
                 }
-            })
-            .catch(error => {
-                console.error('Coupon error:', error);
-                couponFeedback.textContent = 'Could not validate coupon.';
-                couponFeedback.style.color = 'red';
-            })
-            .finally(() => {
-                applyCouponBtn.disabled = false;
+
+                if (couponFeedback) {
+                    couponFeedback.textContent = 'Applying...';
+                    couponFeedback.style.color = '#666';
+                }
+                button.disabled = true;
+
+                const formData = new FormData();
+                formData.append('coupon_code', code);
+                if (csrfToken) formData.append('_token', csrfToken);
+
+                fetch('/apply-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (couponFeedback) {
+                        if (data.success) {
+                            couponFeedback.textContent = data.message || 'Coupon applied successfully!';
+                            couponFeedback.style.color = 'green';
+                            if (data.cartTotalFormatted) {
+                                updateCartTotals(data.cartSubtotalFormatted || data.cartTotalFormatted, data.cartTotalFormatted);
+                            }
+                        } else {
+                            couponFeedback.textContent = data.message || 'Invalid coupon code.';
+                            couponFeedback.style.color = 'red';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Coupon error:', error);
+                    if (couponFeedback) {
+                        couponFeedback.textContent = 'Could not validate coupon.';
+                        couponFeedback.style.color = 'red';
+                    }
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
             });
-        });
-    }
+        }
+    });
 });
 </script>

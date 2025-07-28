@@ -340,29 +340,42 @@
 <script>
 function reorderItems(orderId) {
     if(confirm('Are you sure you want to add all items from this order to your cart?')) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
         fetch(`/orders/${orderId}/reorder`, {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-CSRF-TOKEN': csrfToken,
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if(data.success) {
                 alert(data.message);
+                
                 // Update cart count if you have it in header
-                if(document.getElementById('cart_count')) {
-                    document.getElementById('cart_count').textContent = data.cart_count;
+                if(typeof updateCartCount === 'function' && data.cart_count) {
+                    updateCartCount(data.cart_count);
+                }
+                
+                // Redirect to cart if URL provided
+                if(data.redirect_url) {
+                    window.location.href = data.redirect_url;
                 }
             } else {
                 alert(data.message || 'Error adding items to cart');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error processing reorder request');
+            console.error('Reorder error:', error);
+            alert('Error processing reorder request. Please try again.');
         });
     }
 }
