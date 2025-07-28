@@ -166,6 +166,20 @@ class CartController extends Controller
         return $total;
     }
 
+    // Get cart count for AJAX requests
+    public function getCartCount()
+    {
+        $cart = session()->get('cart', []);
+        $count = count($cart);
+        $total = $this->calculateCartTotal($cart);
+        
+        return response()->json([
+            'cart_count' => $count,
+            'cart_total' => $total,
+            'cart_total_formatted' => '₹' . number_format($total, 2)
+        ]);
+    }
+
     // Response for quantity increase/decrease AJAX
     private function getCartUpdateResponse($id, $cart, $message = 'Cart updated!') {
          $total = $this->calculateCartTotal($cart);

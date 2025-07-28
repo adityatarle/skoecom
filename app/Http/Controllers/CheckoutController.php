@@ -286,14 +286,9 @@ class CheckoutController extends Controller
 
     /**
      * Helper to get the checkout route name.
-     * Replace 'checkout.view' with your actual named route for the checkout page.
-     * Check using `php artisan route:list`
      */
     private function getCheckoutRouteName(): string
     {
-        // **IMPORTANT:** Replace 'checkout.view' with the actual name of the route
-        // that displays your main checkout page (where the form is).
-        // Examples: 'checkout', 'checkout.index', 'showCheckoutForm' etc.
-        return 'checkout.view';
+        return 'checkout';
     }
 }

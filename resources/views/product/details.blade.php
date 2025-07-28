@@ -218,9 +218,16 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="mt-3 d-flex gap-2">
-                            <button class="btn btn-dark add_to_cart1" data-id="{{ $product->id }}">Add to Cart</button>
-                            <!--<button class="btn btn-outline-dark">Buy Now</button>-->
+                        <div class="mt-3 d-flex gap-2 align-items-center">
+                            <button class="btn btn-dark add_to_cart1" data-id="{{ $product->id }}">
+                                <i class="fa fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-outline-secondary add_to_wishlist" data-id="{{ $product->id }}" title="Add to Wishlist">
+                                <i class="fa fa-heart-o"></i> Add to Wishlist
+                            </button>
+                            <button class="btn btn-success" onclick="buyNow({{ $product->id }})">
+                                <i class="fa fa-bolt"></i> Buy Now
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -257,6 +264,31 @@
             });
         });
     });
+
+    // Buy Now functionality
+    function buyNow(productId) {
+        // First add to cart
+        $.ajax({
+            url: "{{ route('cart.add') }}",
+            type: "POST",
+            data: {
+                product_id: productId,
+                _token: "{{ csrf_token() }}"
+            },
+            success: function(response) {
+                if (response.status === "success") {
+                    // Redirect to checkout immediately
+                    window.location.href = "{{ route('checkout') }}";
+                } else {
+                    alert(response.message || 'Error adding product to cart');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Buy Now Error:', xhr.responseText);
+                alert("Error processing buy now request");
+            }
+        });
+    }
 </script>
 
 @include('layout.footer')
