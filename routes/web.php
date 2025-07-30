@@ -114,14 +114,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     });
 
     // Category Management
-    Route::prefix('category')->name('admin.category.')->group(function () {
+    Route::prefix('categories')->name('category.')->group(function () {
         Route::get('/', [ProductCategoryController::class, 'index'])->name('index');
         Route::get('/create', [ProductCategoryController::class, 'create'])->name('create');
         Route::post('/', [ProductCategoryController::class, 'store'])->name('store');
+        Route::get('/{category}', [ProductCategoryController::class, 'show'])->name('show');
         Route::get('/{category}/edit', [ProductCategoryController::class, 'edit'])->name('edit');
         Route::put('/{category}', [ProductCategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [ProductCategoryController::class, 'destroy'])->name('destroy');
+        Route::post('/{category}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('toggle-status');
     });
+    
+    // Category AJAX routes
+    Route::get('/categories/get-by-parent', [ProductCategoryController::class, 'getByParent'])->name('admin.category.getByParent');
     
     Route::resource('subcategory', SubcategoryController::class)->names('admin.subcategory');
 

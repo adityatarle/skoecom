@@ -4,93 +4,275 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-//use Illuminate\Support\Facades\Storage;  // Remove Storage Facade
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ProductCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = ProductCategory::all();
-        return view('admin.category.index', compact('categories'));
+        $query = ProductCategory::with(['parent', 'children'])
+            ->withCount(['products', 'children']);
+            
+        // Filter by level if specified
+        if ($request->has('level') && $request->level !== '') {
+            $query->where('level', $request->level);
+        }
+        
+        // Filter by parent if specified
+        if ($request->has('parent_id') && $request->parent_id !== '') {
+            $query->where('parent_id', $request->parent_id);
+        }
+        
+        // Search functionality
+        if ($request->has('search') && $request->search !== '') {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+        
+        $categories = $query->orderBy('level')->orderBy('sort_order')->orderBy('name')->paginate(15);
+        
+        // Get parent categories for filter dropdown
+        $parentCategories = ProductCategory::whereIn('level', [1, 2])->orderBy('name')->get();
+        
+        return view('admin.category.index', compact('categories', 'parentCategories'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.category.create');
+        $level = $request->get('level', ProductCategory::LEVEL_TOP);
+        $parentCategories = collect();
+        
+        // Get available parent categories based on level
+        if ($level == ProductCategory::LEVEL_PARENT) {
+            $parentCategories = ProductCategory::where('level', ProductCategory::LEVEL_TOP)
+                ->active()
+                ->orderBy('name')
+                ->get();
+        } elseif ($level == ProductCategory::LEVEL_CHILD) {
+            $parentCategories = ProductCategory::where('level', ProductCategory::LEVEL_PARENT)
+                ->active()
+                ->orderBy('name')
+                ->get();
+        }
+        
+        return view('admin.category.create', compact('level', 'parentCategories'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        $category = new ProductCategory();
-        $category->name = $request->input('name');
-
+            'description' => 'nullable|string|max:1000',
+            'level' => 'required|integer|in:1,2,3',
+            'parent_id' => 'nullable|exists:product_categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'is_active' => 'boolean',
+            'sort_order' => 'nullable|integer|min:0'
+        ];
+        
+        // Validate parent_id based on level
+        if ($request->level == ProductCategory::LEVEL_PARENT) {
+            $rules['parent_id'] = 'required|exists:product_categories,id';
+        } elseif ($request->level == ProductCategory::LEVEL_CHILD) {
+            $rules['parent_id'] = 'required|exists:product_categories,id';
+        } elseif ($request->level == ProductCategory::LEVEL_TOP) {
+            $rules['parent_id'] = 'nullable';
+        }
+        
+        $validated = $request->validate($rules);
+        
+        // Generate slug
+        $validated['slug'] = Str::slug($validated['name']);
+        
+        // Ensure unique slug
+        $originalSlug = $validated['slug'];
+        $counter = 1;
+        while (ProductCategory::where('slug', $validated['slug'])->exists()) {
+            $validated['slug'] = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-             $image->move(public_path('images'), $imageName); // Move to public/images
-            $category->image = 'images/' . $imageName;  // Store the path
+            $imageName = time() . '_' . Str::slug($validated['name']) . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/categories'), $imageName);
+            $validated['image'] = 'images/categories/' . $imageName;
         }
+        
+        // Set default values
+        $validated['is_active'] = $request->has('is_active');
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        
+        // Validate hierarchy logic
+        if ($validated['level'] == ProductCategory::LEVEL_TOP) {
+            $validated['parent_id'] = null;
+        }
+        
+        $category = ProductCategory::create($validated);
+        
+        return redirect()->route('admin.category.index')
+            ->with('success', 'Category created successfully!');
+    }
 
-        $category->save();
-
-        return redirect()->route('admin.category.index')->with('success', 'Category created successfully');
+    public function show(ProductCategory $category)
+    {
+        $category->load(['parent', 'children.children', 'products']);
+        
+        $stats = [
+            'total_products' => $category->allProducts()->count(),
+            'direct_products' => $category->products()->count(),
+            'child_categories' => $category->children()->count(),
+            'total_descendants' => $this->countDescendants($category)
+        ];
+        
+        return view('admin.category.show', compact('category', 'stats'));
     }
 
     public function edit(ProductCategory $category)
     {
-        return view('admin.category.edit', compact('category'));
+        $parentCategories = collect();
+        
+        // Get available parent categories based on level
+        if ($category->level == ProductCategory::LEVEL_PARENT) {
+            $parentCategories = ProductCategory::where('level', ProductCategory::LEVEL_TOP)
+                ->where('id', '!=', $category->id)
+                ->active()
+                ->orderBy('name')
+                ->get();
+        } elseif ($category->level == ProductCategory::LEVEL_CHILD) {
+            $parentCategories = ProductCategory::where('level', ProductCategory::LEVEL_PARENT)
+                ->where('id', '!=', $category->id)
+                ->active()
+                ->orderBy('name')
+                ->get();
+        }
+        
+        return view('admin.category.edit', compact('category', 'parentCategories'));
     }
 
     public function update(Request $request, ProductCategory $category)
     {
-        $request->validate([
-           'name' => 'required|unique:product_categories,name,' . $category->id,
-           'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-         $category->name = $request->input('name');
-
+        $rules = [
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'level' => 'required|integer|in:1,2,3',
+            'parent_id' => 'nullable|exists:product_categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'is_active' => 'boolean',
+            'sort_order' => 'nullable|integer|min:0'
+        ];
+        
+        // Validate parent_id based on level
+        if ($request->level == ProductCategory::LEVEL_PARENT) {
+            $rules['parent_id'] = 'required|exists:product_categories,id';
+        } elseif ($request->level == ProductCategory::LEVEL_CHILD) {
+            $rules['parent_id'] = 'required|exists:product_categories,id';
+        } elseif ($request->level == ProductCategory::LEVEL_TOP) {
+            $rules['parent_id'] = 'nullable';
+        }
+        
+        $validated = $request->validate($rules);
+        
+        // Generate slug if name changed
+        if ($category->name !== $validated['name']) {
+            $validated['slug'] = Str::slug($validated['name']);
+            
+            // Ensure unique slug
+            $originalSlug = $validated['slug'];
+            $counter = 1;
+            while (ProductCategory::where('slug', $validated['slug'])->where('id', '!=', $category->id)->exists()) {
+                $validated['slug'] = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+        }
+        
+        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete the previous image if it exists
-            if ($category->image) {
-                $fullPath = public_path($category->image);
-                if(file_exists($fullPath)) {
-                   unlink($fullPath);
-                }
+            // Delete old image
+            if ($category->image && file_exists(public_path($category->image))) {
+                unlink(public_path($category->image));
             }
             
-           $image = $request->file('image');
-           $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images'), $imageName); // Move to public/images
-            $category->image = 'images/' . $imageName;  // Store the path
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($validated['name']) . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/categories'), $imageName);
+            $validated['image'] = 'images/categories/' . $imageName;
         }
-
-        $category->save();
-
-        return Redirect::route('admin.category.index')->with('success', 'Category updated successfully!');
+        
+        // Set default values
+        $validated['is_active'] = $request->has('is_active');
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        
+        // Validate hierarchy logic
+        if ($validated['level'] == ProductCategory::LEVEL_TOP) {
+            $validated['parent_id'] = null;
+        }
+        
+        $category->update($validated);
+        
+        return redirect()->route('admin.category.index')
+            ->with('success', 'Category updated successfully!');
     }
 
-   public function destroy(ProductCategory $category)
+    public function destroy(ProductCategory $category)
     {
-       if ($category->products()->count() > 0) {
-          return Redirect::route('admin.category.index')->with('error', 'Cannot delete category if it has assigned products!');
-       }
-         // Delete the image from the disk before deleting the record
-         if($category->image){
-            $fullPath = public_path($category->image);
-              if (file_exists($fullPath)) {
-                  unlink($fullPath);
-              }
-           }
+        // Check if category has children
+        if ($category->hasChildren()) {
+            return redirect()->back()
+                ->with('error', 'Cannot delete category that has child categories. Please delete or move child categories first.');
+        }
+        
+        // Check if category has products
+        if ($category->products()->exists()) {
+            return redirect()->back()
+                ->with('error', 'Cannot delete category that has products. Please move or delete products first.');
+        }
+        
+        // Delete image if exists
+        if ($category->image && file_exists(public_path($category->image))) {
+            unlink(public_path($category->image));
+        }
+        
+        $category->delete();
+        
+        return redirect()->route('admin.category.index')
+            ->with('success', 'Category deleted successfully!');
+    }
 
-       $category->delete();
+    public function getByParent(Request $request)
+    {
+        $parentId = $request->get('parent_id');
+        $level = $request->get('level', 2);
+        
+        $categories = ProductCategory::where('parent_id', $parentId)
+            ->where('level', $level)
+            ->active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'level']);
+            
+        return response()->json($categories);
+    }
 
-       return Redirect::route('admin.category.index')->with('success', 'Category deleted successfully!');
-   }
+    public function toggleStatus(ProductCategory $category)
+    {
+        $category->update(['is_active' => !$category->is_active]);
+        
+        return response()->json([
+            'success' => true,
+            'status' => $category->is_active,
+            'message' => $category->is_active ? 'Category activated' : 'Category deactivated'
+        ]);
+    }
+
+    private function countDescendants(ProductCategory $category)
+    {
+        $count = $category->children()->count();
+        foreach ($category->children as $child) {
+            $count += $this->countDescendants($child);
+        }
+        return $count;
+    }
 }
