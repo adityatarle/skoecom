@@ -1,74 +1,240 @@
 @include('dashboard.layout.header')
 
-<div class="container mx-auto p-4 bg-gray-800 text-white" style="max-width: 1200px; margin-left: auto; margin-right: auto; padding: 1rem;">
-  <h1 class="text-2xl font-bold mb-4" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Dashboard Overview</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6" style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; @media (min-width: 768px) { grid-template-columns: repeat(3, minmax(0, 1fr)); }">
-    <!-- Left Column: Recent Activity -->
-    <div class="md:col-span-2" style="@media (min-width: 768px) { grid-column: span 2 / span 2; }">
-      <div class="bg-gray-700 shadow rounded p-4" style="background-color: rgb(55 65 81); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border-radius: 0.25rem; padding: 1rem;">
-        <h2 class="text-lg font-semibold mb-3 text-white" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;">Recent Activity</h2>
-         <ul class="divide-y divide-gray-600" style="border-top-width: 1px; border-color: rgb(75 85 99);">
-            <li class="py-3" style="padding-top: 0.75rem; padding-bottom: 0.75rem;">
-                <div class="flex items-center" style="display: flex; align-items: center;">
-                    <div class="mr-4" style="margin-right: 1rem;">
-                        <i class="fas fa-user text-gray-400 fa-lg" style="color: rgb(160 174 192); font-size: 1.25rem;"></i>
-                    </div>
-                    <div class="flex-1" style="flex: 1 1 0%;">
-                        <p class="font-medium text-white" style="font-weight: 500;">New user <span class="font-bold" style="font-weight: bold;">Jane Doe</span> registered.</p>
-                        <p class="text-sm text-gray-400" style="font-size: 0.875rem; color: rgb(160 174 192);">5 minutes ago</p>
-                    </div>
-                </div>
-            </li>
-            <li class="py-3" style="padding-top: 0.75rem; padding-bottom: 0.75rem;">
-                <div class="flex items-center" style="display: flex; align-items: center;">
-                    <div class="mr-4" style="margin-right: 1rem;">
-                        <i class="fas fa-comment text-gray-400 fa-lg" style="color: rgb(160 174 192); font-size: 1.25rem;"></i>
-                    </div>
-                    <div class="flex-1" style="flex: 1 1 0%;">
-                    <p class="font-medium text-white" style="font-weight: 500;">User <span class="font-bold" style="font-weight: bold;">John Smith</span> posted a comment.</p>
-                    <p class="text-sm text-gray-400" style="font-size: 0.875rem; color: rgb(160 174 192);">15 minutes ago</p>
+<div class="container-fluid py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="h3 mb-2 fw-bold">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                Welcome to SK Ornaments Dashboard
+                            </h1>
+                            <p class="mb-0 opacity-90">
+                                Manage your ecommerce store efficiently with our comprehensive admin panel
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="d-flex align-items-center justify-content-md-end">
+                                <i class="fas fa-gem fa-3x opacity-75"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </li>
-            <li class="py-3" style="padding-top: 0.75rem; padding-bottom: 0.75rem;">
-                <div class="flex items-center" style="display: flex; align-items: center;">
-                    <div class="mr-4" style="margin-right: 1rem;">
-                        <i class="fas fa-file-alt text-gray-400 fa-lg" style="color: rgb(160 174 192); font-size: 1.25rem;"></i>
-                    </div>
-                    <div class="flex-1" style="flex: 1 1 0%;">
-                    <p class="font-medium text-white" style="font-weight: 500;">New blog post published by Admin.</p>
-                    <p class="text-sm text-gray-400" style="font-size: 0.875rem; color: rgb(160 174 192);">1 hour ago</p>
-                    </div>
-                </div>
-            </li>
-            </ul>
-      </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Right Column: Key Metrics -->
-    <div class="md:col-span-1" style="@media (min-width: 768px) { grid-column: span 1 / span 1; }">
-        <div class="grid grid-cols-1 gap-4" style="display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1rem;">
-           <div class="bg-gray-700 shadow rounded p-4" style="background-color: rgb(55 65 81); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border-radius: 0.25rem; padding: 1rem;">
-                <h2 class="text-lg font-semibold mb-2 text-white" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Total Users</h2>
-                <p class="text-3xl font-bold text-white" style="font-size: 1.875rem; font-weight: bold;">12,543</p>
+    <!-- Key Metrics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2 fw-bold">Total Products</h6>
+                            <span class="h2 fw-bold mb-0">{{ \App\Models\Product::count() }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-primary text-white">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-           <div class="bg-gray-700 shadow rounded p-4" style="background-color: rgb(55 65 81); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border-radius: 0.25rem; padding: 1rem;">
-                <h2 class="text-lg font-semibold mb-2 text-white" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Active Users</h2>
-                <p class="text-3xl font-bold text-white" style="font-size: 1.875rem; font-weight: bold;">8,210</p>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2 fw-bold">Categories</h6>
+                            <span class="h2 fw-bold mb-0">{{ \App\Models\ProductCategory::count() }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-success text-white">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="bg-gray-700 shadow rounded p-4" style="background-color: rgb(55 65 81); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border-radius: 0.25rem; padding: 1rem;">
-                <h2 class="text-lg font-semibold mb-2 text-white" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Total Posts</h2>
-                <p class="text-3xl font-bold text-white" style="font-size: 1.875rem; font-weight: bold;">5,345</p>
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2 fw-bold">Subcategories</h6>
+                            <span class="h2 fw-bold mb-0">{{ \App\Models\Subcategory::count() }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-info text-white">
+                                <i class="fas fa-sitemap"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-              <div class="bg-gray-700 shadow rounded p-4" style="background-color: rgb(55 65 81); box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border-radius: 0.25rem; padding: 1rem;">
-                    <h2 class="text-lg font-semibold mb-2 text-white" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Total Comments</h2>
-                    <p class="text-3xl font-bold text-white" style="font-size: 1.875rem; font-weight: bold;">2,567</p>
-              </div>
-       </div>
-
+        </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted mb-2 fw-bold">Total Orders</h6>
+                            <span class="h2 fw-bold mb-0">{{ \App\Models\Order::count() }}</span>
+                        </div>
+                        <div class="col-auto">
+                            <div class="icon-circle bg-warning text-white">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <!-- Recent Activity -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="icon-circle bg-success text-white">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">New Product Added</h6>
+                                    <p class="text-muted mb-0 small">Latest jewelry item was added to the catalog</p>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="icon-circle bg-primary text-white">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">New Order Received</h6>
+                                    <p class="text-muted mb-0 small">Customer placed an order for gold necklace</p>
+                                    <small class="text-muted">5 hours ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="icon-circle bg-info text-white">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">New Review Posted</h6>
+                                    <p class="text-muted mb-0 small">Customer left a 5-star review for silver earrings</p>
+                                    <small class="text-muted">1 day ago</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <div class="icon-circle bg-warning text-white">
+                                        <i class="fas fa-question-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">Product Inquiry</h6>
+                                    <p class="text-muted mb-0 small">Customer inquired about custom jewelry design</p>
+                                    <small class="text-muted">2 days ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom-0 py-3">
+                    <h5 class="card-title mb-0 fw-bold">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="{{ route('admin.product.create') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>Add New Product
+                        </a>
+                        <a href="{{ route('admin.subcategory.create') }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-sitemap me-2"></i>Add Subcategory
+                        </a>
+                        <a href="#" class="btn btn-info btn-lg">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics
+                        </a>
+                        <a href="#" class="btn btn-warning btn-lg">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.icon-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
 
 @include('dashboard.layout.footer')

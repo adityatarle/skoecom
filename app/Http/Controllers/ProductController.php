@@ -70,10 +70,10 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // Validation remains the same
+        // Updated validation with more flexible description rules
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string', // Description is just a string initially
+            'description' => 'nullable|string|max:10000', // Increased max length and allow any string content including digits
             'category_id' => 'required|exists:product_categories,id',
             'sub_category_id' => 'nullable|exists:subcategories,id',
             'price' => 'required|numeric|min:0',
@@ -81,10 +81,10 @@ class ProductController extends Controller
             'gst_percentage' => 'nullable|numeric|min:0|max:100',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', // Added webp
             'components' => 'required|array',
-            'components.*.name' => 'required|string',
-            'components.*.weight' => 'nullable|numeric',
-            'components.*.rate' => 'nullable|numeric',
-            'components.*.total_value' => 'required|numeric'
+            'components.*.name' => 'required|string|max:255',
+            'components.*.weight' => 'nullable|numeric|min:0',
+            'components.*.rate' => 'nullable|numeric|min:0',
+            'components.*.total_value' => 'required|numeric|min:0'
         ]);
 
         // *** Purify the description HTML ***

@@ -20,7 +20,9 @@ class Product extends Model
         'price',
         'image_path',
         'category_id',
-        'sub_category_id'
+        'sub_category_id',
+        'labour_charges',
+        'gst_percentage'
     ];
 
      protected $casts = [
