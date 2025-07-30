@@ -11,31 +11,67 @@ class ProductCategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProductCategory::with(['parent', 'children'])
-            ->withCount(['products', 'children']);
+        try {
+            // Start with a simple query first
+            $query = ProductCategory::query();
             
-        // Filter by level if specified
-        if ($request->has('level') && $request->level !== '') {
-            $query->where('level', $request->level);
+            // Add relationships
+            $query->with(['parent', 'children']);
+            // Temporarily remove withCount to test if it's causing the issue
+            // $query->withCount(['products', 'children']);
+                
+            // Filter by level if specified
+            if ($request->has('level') && $request->level !== '') {
+                $query->where('level', $request->level);
+            }
+            
+            // Filter by parent if specified
+            if ($request->has('parent_id') && $request->parent_id !== '') {
+                $query->where('parent_id', $request->parent_id);
+            }
+            
+            // Search functionality
+            if ($request->has('search') && $request->search !== '') {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('name', 'like', '%' . $searchTerm . '%')
+                      ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                });
+            }
+            
+            // Add ordering
+            $query->orderBy('level')->orderBy('sort_order')->orderBy('name');
+            
+            // Paginate
+            $categories = $query->paginate(15);
+            
+            // Get parent categories for filter dropdown
+            $parentCategories = ProductCategory::whereIn('level', [1, 2])->orderBy('name')->get();
+            
+            // Ensure categories is a paginator instance
+            if (!$categories instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                \Log::error('Categories is not a paginator instance', [
+                    'type' => get_class($categories),
+                    'categories' => $categories
+                ]);
+                // Fallback to a simple collection if pagination fails
+                $categories = $query->get();
+            }
+            
+            return view('admin.category.index', compact('categories', 'parentCategories'));
+            
+        } catch (\Exception $e) {
+            \Log::error('Error in ProductCategoryController@index: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Return empty results on error
+            $categories = collect();
+            $parentCategories = collect();
+            
+            return view('admin.category.index', compact('categories', 'parentCategories'))
+                ->with('error', 'An error occurred while loading categories. Please try again.');
         }
-        
-        // Filter by parent if specified
-        if ($request->has('parent_id') && $request->parent_id !== '') {
-            $query->where('parent_id', $request->parent_id);
-        }
-        
-        // Search functionality
-        if ($request->has('search') && $request->search !== '') {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
-        }
-        
-        $categories = $query->orderBy('level')->orderBy('sort_order')->orderBy('name')->paginate(15);
-        
-        // Get parent categories for filter dropdown
-        $parentCategories = ProductCategory::whereIn('level', [1, 2])->orderBy('name')->get();
-        
-        return view('admin.category.index', compact('categories', 'parentCategories'));
     }
 
     public function create(Request $request)
@@ -274,5 +310,33 @@ class ProductCategoryController extends Controller
             $count += $this->countDescendants($child);
         }
         return $count;
+    }
+
+    /**
+     * Test method for debugging pagination issues
+     */
+    public function testPagination()
+    {
+        try {
+            // Simple query without any relationships
+            $categories = ProductCategory::query()->paginate(15);
+            
+            return response()->json([
+                'success' => true,
+                'type' => get_class($categories),
+                'hasPages' => method_exists($categories, 'hasPages') ? $categories->hasPages() : 'Method not found',
+                'count' => $categories->count(),
+                'total' => $categories->total(),
+                'perPage' => $categories->perPage(),
+                'currentPage' => $categories->currentPage(),
+                'lastPage' => $categories->lastPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
     }
 }

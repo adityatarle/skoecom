@@ -72,7 +72,7 @@ class ProductCategory extends Model
      */
     public function descendants(): HasMany
     {
-        return $this->hasMany(ProductCategory::class, 'parent_id')->with('descendants');
+        return $this->hasMany(ProductCategory::class, 'parent_id');
     }
 
     /**
@@ -156,6 +156,6 @@ class ProductCategory extends Model
             $productIds->push($descendant->id);
         });
         
-        return Product::whereIn('category_id', $productIds);
+        return Product::whereIn('category_id', $productIds->toArray());
     }
 }

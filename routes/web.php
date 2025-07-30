@@ -123,6 +123,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         Route::put('/{category}', [ProductCategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [ProductCategoryController::class, 'destroy'])->name('destroy');
         Route::post('/{category}/toggle-status', [ProductCategoryController::class, 'toggleStatus'])->name('toggle-status');
+        Route::get('/test/pagination', [ProductCategoryController::class, 'testPagination'])->name('test-pagination');
     });
     
     // Category AJAX routes
@@ -147,3 +148,21 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 // Admin subcategories helper route
 Route::get('/admin/subcategories/get-by-category', [SubcategoryController::class, 'getByCategory'])->name('admin.subcategory.getByCategory');
 Route::get('/admin/subcategories/get-by-parent', [SubcategoryController::class, 'getSubcategoriesByParent'])->name('admin.subcategory.getByParent');
+
+// Debug route for testing database connection
+Route::get('/debug/categories', function() {
+    try {
+        $categories = \App\Models\ProductCategory::all();
+        return response()->json([
+            'success' => true,
+            'count' => $categories->count(),
+            'categories' => $categories->take(5)->toArray()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+})->name('debug.categories');
