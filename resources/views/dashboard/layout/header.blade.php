@@ -4,7 +4,7 @@
 <!--begin::Head-->
 
 <head>
-    <title>Sk Ornaments</title>
+    <title>SK Ornaments - Admin Dashboard</title>
     <meta charset="utf-8" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -25,6 +25,214 @@
 
     <link href="{{ asset('admin/assets/css/style.bundle.css') }}" rel="stylesheet">
     <!--end::Global Stylesheets Bundle-->
+    
+    <!-- Custom Sidebar Styles -->
+    <style>
+        /* Enhanced Sidebar Styles */
+        .app-sidebar {
+            background: linear-gradient(180deg, #1e1e2d 0%, #1a1a27 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-sidebar-logo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 1.25rem;
+        }
+        
+        .app-sidebar-logo a {
+            text-decoration: none;
+        }
+        
+        .app-sidebar-logo .card-title {
+            background: linear-gradient(45deg, #fff, #f8f9fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .app-sidebar-logo-minimize .card-title {
+            font-size: 1.25rem;
+        }
+        
+        /* Enhanced Menu Styles */
+        .menu {
+            padding: 0.5rem 0;
+        }
+        
+        .menu-item {
+            margin: 0.25rem 0.75rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .menu-item.here {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .menu-item.show {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        
+        .menu-link {
+            padding: 0.875rem 1rem;
+            border-radius: 0.75rem;
+            color: #a1a5b7;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .menu-link.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .menu-icon {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover .menu-icon {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+        
+        .menu-item.here .menu-icon,
+        .menu-link.active .menu-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .menu-title {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .menu-arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-item.show .menu-arrow {
+            transform: rotate(90deg);
+        }
+        
+        /* Submenu Styles */
+        .menu-sub {
+            padding: 0.5rem 0;
+            margin: 0.25rem 0;
+        }
+        
+        .menu-sub .menu-item {
+            margin: 0.125rem 0;
+        }
+        
+        .menu-sub .menu-link {
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.5rem;
+        }
+        
+        .menu-bullet {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.7;
+            margin-right: 0.75rem;
+        }
+        
+        /* Scrollbar Styling */
+        .scroll-y::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .scroll-y::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+        
+        .scroll-y::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        
+        .scroll-y::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Sidebar Toggle Button */
+        .app-sidebar-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .app-sidebar-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Category Badges */
+        .menu-category {
+            padding: 0.5rem 1rem;
+            margin: 1rem 0.75rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c7293;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Notification Badge */
+        .menu-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            margin-left: auto;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .app-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .app-sidebar.show {
+                transform: translateX(0);
+            }
+        }
+    </style>
+    
     <script>
         // Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }
     </script>
@@ -267,7 +475,7 @@
                         <!--begin::Logo image-->
                         <a href="#">
                             <h3 class="mb-0 text-white app-sidebar-logo-default card-title">SK Ornaments</h3>
-                            <h4 class="mb-0 text-white app-sidebar-logo-minimize card-title">SK Ornaments</h4>
+                            <h4 class="mb-0 text-white app-sidebar-logo-minimize card-title">SK</h4>
                         </a>
                         <!--end::Logo image-->
                         <!--begin::Sidebar toggle-->
@@ -292,8 +500,6 @@
                     </div>
                     <!--end::Logo-->
 
-
-
                     <!--begin::sidebar menu-->
                     <div class="overflow-hidden app-sidebar-menu flex-column-fluid">
                         <!--begin::Menu wrapper-->
@@ -308,9 +514,11 @@
                                 <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6"
                                     id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
 
-                                    <!-- Menu item for Dashboard -->
-                                    <div data-kt-menu-trigger="click" class="menu-item here menu-accordion">
-                                        <span class="menu-link">
+                                    <!-- Dashboard Section -->
+                                    <div class="menu-category">Main Navigation</div>
+                                    
+                                    <div data-kt-menu-trigger="click" class="menu-item {{ request()->routeIs('dashboard') ? 'here' : '' }}">
+                                        <a href="{{ route('dashboard') }}" class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                             <span class="menu-icon">
                                                 <i class="ki-duotone ki-element-11 fs-2">
                                                     <span class="path1"></span>
@@ -320,14 +528,20 @@
                                                 </i>
                                             </span>
                                             <span class="menu-title">Dashboard</span>
-                                        </span>
+                                        </a>
                                     </div>
+
+                                    <!-- Content Management Section -->
+                                    <div class="menu-category">Content Management</div>
+                                    
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.category.*') ? 'show' : '' }}">
                                         <span class="menu-link">
                                             <span class="menu-icon">
-                                                <i class="ki-duotone ki-file fs-2">
+                                                <i class="ki-duotone ki-category fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
                                                 </i>
                                             </span>
                                             <span class="menu-title">Categories</span>
@@ -352,12 +566,15 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.subcategory.*') ? 'show' : '' }}">
                                         <span class="menu-link">
                                             <span class="menu-icon">
-                                                <i class="ki-duotone ki-file fs-2">
+                                                <i class="ki-duotone ki-folder fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
                                                 </i>
                                             </span>
                                             <span class="menu-title">Sub Categories</span>
@@ -369,7 +586,7 @@
                                                     <span class="menu-bullet">
                                                         <span class="bullet bullet-dot"></span>
                                                     </span>
-                                                    <span class="menu-title">All Categories</span>
+                                                    <span class="menu-title">All Subcategories</span>
                                                 </a>
                                             </div>
                                             <div class="menu-item">
@@ -382,12 +599,15 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.product.*') ? 'show' : '' }}">
                                         <span class="menu-link">
                                             <span class="menu-icon">
-                                                <i class="ki-duotone ki-file fs-2">
+                                                <i class="ki-duotone ki-box fs-2">
                                                     <span class="path1"></span>
                                                     <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
                                                 </i>
                                             </span>
                                             <span class="menu-title">Products</span>
@@ -410,46 +630,209 @@
                                                     <span class="menu-title">Add Product</span>
                                                 </a>
                                             </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link {{ request()->routeIs('admin.product.inquiries') ? 'active' : '' }}" href="{{ route('admin.product.inquiries') }}">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Product Inquiries</span>
+                                                    <span class="menu-badge">New</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
 
+                                    <!-- Sales & Orders Section -->
+                                    <div class="menu-category">Sales & Orders</div>
 
-                                     <!-- Orders Section -->
-                <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.orders.*') ? 'show' : '' }}">
-                    <span class="menu-link">
-                        <span class="menu-icon">
-                            <i class="ki-duotone ki-basket fs-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                                <span class="path4"></span>
-                            </i>
-                        </span>
-                        <span class="menu-title">Orders</span>
-                        <span class="menu-arrow"></span>
-                    </span>
-                    <div class="menu-sub menu-sub-accordion menu-active-bg">
-                        <div class="menu-item">
-                            <a class="menu-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
-                                <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
-                                </span>
-                                <span class="menu-title">All Orders</span>
-                            </a>
-                        </div>
-                        <!-- <div class="menu-item">
-                            <a class="menu-link {{ request()->routeIs('admin.orders.export') ? 'active' : '' }}" href="{{ route('admin.orders.export') }}">
-                                <span class="menu-bullet">
-                                    <span class="bullet bullet-dot"></span>
-                                </span>
-                                <span class="menu-title">Export Orders</span>
-                            </a>
-                        </div> -->
-                    </div>
-                </div>
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.orders.*') ? 'show' : '' }}">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-basket fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Orders</span>
+                                            <span class="menu-arrow"></span>
+                                        </span>
+                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                            <div class="menu-item">
+                                                <a class="menu-link {{ request()->routeIs('admin.orders.index') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">All Orders</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link {{ request()->routeIs('admin.orders.export') ? 'active' : '' }}" href="{{ route('admin.orders.export') }}">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Export Orders</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                    <!-- Inquiries Section -->
-                                    
+                                    <!-- Customer Management Section -->
+                                    <div class="menu-category">Customer Management</div>
+
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-user fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Customers</span>
+                                            <span class="menu-arrow"></span>
+                                        </span>
+                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">All Customers</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Customer Groups</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Reviews & Feedback Section -->
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.reviews.*') ? 'show' : '' }}">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-star fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Reviews</span>
+                                            <span class="menu-arrow"></span>
+                                        </span>
+                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                            <div class="menu-item">
+                                                <a class="menu-link {{ request()->routeIs('admin.reviews.index') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">All Reviews</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Pending Reviews</span>
+                                                    <span class="menu-badge">5</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Analytics & Reports Section -->
+                                    <div class="menu-category">Analytics & Reports</div>
+
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-chart-simple fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Analytics</span>
+                                            <span class="menu-arrow"></span>
+                                        </span>
+                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Sales Reports</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Product Performance</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Customer Analytics</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Settings Section -->
+                                    <div class="menu-category">Settings</div>
+
+                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+                                        <span class="menu-link">
+                                            <span class="menu-icon">
+                                                <i class="ki-duotone ki-gear fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                    <span class="path4"></span>
+                                                </i>
+                                            </span>
+                                            <span class="menu-title">Settings</span>
+                                            <span class="menu-arrow"></span>
+                                        </span>
+                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">General Settings</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Payment Settings</span>
+                                                </a>
+                                            </div>
+                                            <div class="menu-item">
+                                                <a class="menu-link" href="#">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">Email Settings</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <!--end::Scroll wrapper-->
                             </div>
