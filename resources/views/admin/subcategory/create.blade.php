@@ -56,8 +56,12 @@
                             <select name="parent_subcategory_id" id="parent_subcategory_id" class="form-select form-select-lg">
                                 <option value="">None (Top Level Subcategory)</option>
                                 @foreach($parentSubcategories as $parentSubcategory)
-                                    <option value="{{ $parentSubcategory->id }}" {{ old('parent_subcategory_id') == $parentSubcategory->id ? 'selected' : '' }}>
+                                    <option value="{{ $parentSubcategory->id }}" 
+                                        {{ (old('parent_subcategory_id', $selectedParentId ?? null) == $parentSubcategory->id) ? 'selected' : '' }}>
                                         {{ $parentSubcategory->name }}
+                                        @if($parentSubcategory->category)
+                                            - {{ $parentSubcategory->category->name }}
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>

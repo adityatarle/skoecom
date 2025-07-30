@@ -15,11 +15,15 @@ class SubcategoryController extends Controller
         return view('admin.subcategory.index', compact('subcategories'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $categories = ProductCategory::all();
         $parentSubcategories = Subcategory::whereNull('parent_subcategory_id')->get();
-        return view('admin.subcategory.create', compact('categories', 'parentSubcategories'));
+        
+        // If parent_id is provided, pre-select it
+        $selectedParentId = $request->get('parent_id');
+        
+        return view('admin.subcategory.create', compact('categories', 'parentSubcategories', 'selectedParentId'));
     }
 
     public function store(Request $request)
