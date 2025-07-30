@@ -114,7 +114,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     });
 
     // Category Management
-    Route::prefix('categories')->name('category.')->group(function () {
+    Route::prefix('categories')->name('admin.category.')->group(function () {
         Route::get('/', [ProductCategoryController::class, 'index'])->name('index');
         Route::get('/create', [ProductCategoryController::class, 'create'])->name('create');
         Route::post('/', [ProductCategoryController::class, 'store'])->name('store');

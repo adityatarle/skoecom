@@ -6,6 +6,7 @@
 <head>
     <title>Sk Ornaments</title>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:locale" content="en_US" />
@@ -342,7 +343,7 @@
                                                 </a>
                                             </div>
                                             <div class="menu-item">
-                                                <a class="menu-link {{ request()->routeIs('admin.category.create') ? 'active' : '' }}" href="{{ route('admin.category.create') }}">
+                                                <a class="menu-link {{ request()->routeIs('admin.category.create') ? 'active' : '' }}" href="{{ route('admin.category.create', ['level' => 1]) }}">
                                                     <span class="menu-bullet">
                                                         <span class="bullet bullet-dot"></span>
                                                     </span>
