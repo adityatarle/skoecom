@@ -89,6 +89,13 @@
                         </div>
                     @endif
 
+                    @if(isset($error))
+                        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ $error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-dark">
@@ -169,10 +176,10 @@
                                             @endswitch
                                         </td>
                                         <td class="px-4 py-3">
-                                            <span class="badge bg-secondary">{{ $category->products_count }}</span>
+                                            <span class="badge bg-secondary">{{ $category->products_count ?? $category->products->count() }}</span>
                                         </td>
                                         <td class="px-4 py-3">
-                                            <span class="badge bg-warning">{{ $category->children_count }}</span>
+                                            <span class="badge bg-warning">{{ $category->children_count ?? $category->children->count() }}</span>
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="form-check form-switch">
@@ -228,9 +235,15 @@
                         </table>
                     </div>
 
-                    @if($categories->hasPages())
+                    @if($categories instanceof \Illuminate\Pagination\LengthAwarePaginator && $categories->hasPages())
                         <div class="card-footer bg-white border-top-0">
                             {{ $categories->appends(request()->query())->links() }}
+                        </div>
+                    @elseif($categories instanceof \Illuminate\Support\Collection && $categories->count() > 0)
+                        <div class="card-footer bg-white border-top-0">
+                            <div class="text-center text-muted">
+                                <small>Showing {{ $categories->count() }} categories (pagination disabled)</small>
+                            </div>
                         </div>
                     @endif
                 </div>
