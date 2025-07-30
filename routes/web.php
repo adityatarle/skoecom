@@ -141,3 +141,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 // Admin subcategories helper route
 Route::get('/admin/subcategories/get-by-category', [SubcategoryController::class, 'getByCategory'])->name('admin.subcategory.getByCategory');
+Route::get('/admin/subcategories/get-by-parent', [SubcategoryController::class, 'getSubcategoriesByParent'])->name('admin.subcategory.getByParent');
