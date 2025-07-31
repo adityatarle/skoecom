@@ -1,28 +1,44 @@
+@php
+use App\Models\Setting;
+$footerLinks = [
+    'Home' => Setting::get('footer_home', '/'),
+    'Online Store' => Setting::get('footer_store', '/products'),
+    'Promotion' => Setting::get('footer_promotion', '/promotion'),
+    'Privacy Policy' => Setting::get('footer_privacy', '/privacy-policy'),
+    'Terms Of Use' => Setting::get('footer_terms', '/terms-of-use'),
+    'Sitemap' => Setting::get('footer_sitemap', '/sitemap'),
+    'Support' => Setting::get('footer_support', '/support'),
+    'Contacts' => Setting::get('footer_contacts', '/contact'),
+];
+$contact_address = Setting::get('contact_address');
+$contact_phone = Setting::get('contact_phone');
+$contact_email = Setting::get('contact_email');
+@endphp
 </div>
-
-<div id="kt_app_footer" class="app-footer">
-    <!--begin::Footer container-->
-    <div class="py-3 app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack">
-        <!--begin::Copyright-->
-        <div class="order-2 text-gray-900 order-md-1">
-            <span class="text-muted fw-semibold me-1">2025&copy;</span>
-            <a href="#" target="_blank" class="text-gray-800 text-hover-primary">Preona</a>
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-2 mb-md-0">
+                <span class="fw-bold">&copy; {{ date('Y') }} {{ config('app.name') }}</span>
+                <span class="ms-2">Developed by Blaze Fusion Technologies</span>
+            </div>
+            <div class="col-md-6 text-md-end">
+                @foreach($footerLinks as $label => $url)
+                    <a href="{{ $url }}" class="text-light text-decoration-none mx-2">{{ $label }}</a>
+                @endforeach
+            </div>
         </div>
-        <!--end::Copyright-->
-        <!--begin::Menu-->
-        <ul class="order-1 menu menu-gray-600 menu-hover-primary fw-semibold">
-            <li class="menu-item">
-                <a href="#" target="_blank" class="px-2 menu-link">Developed By Blaze Fusion Technologies</a>
-            </li>
-        </ul>
-        <!--end::Menu-->
+        <div class="row mt-3">
+            <div class="col-md-4 small"><i class="fas fa-map-marker-alt me-1"></i> {{ $contact_address }}</div>
+            <div class="col-md-4 small"><i class="fas fa-phone me-1"></i> {{ $contact_phone }}</div>
+            <div class="col-md-4 small"><i class="fas fa-envelope me-1"></i> {{ $contact_email }}</div>
+        </div>
     </div>
-</div>
+</footer>
 <!--end::Footer-->
 <!--end:::Main-->
 </div>
 <!--end::Wrapper-->
-
 <!--end::Page-->
 </div>
 <!--end::App-->
@@ -30,12 +46,8 @@
 <script>
     var hostUrl = "assets/";
 </script>
-<!--begin::Global Javascript Bundle(mandatory for all pages)-->
-
 <script src="{{ asset('admin/assets/plugins/global/plugins.bundle.js') }}"></script>
 <script src="{{ asset('admin/assets/js/scripts.bundle.js') }}"></script>
-<!--end::Global Javascript Bundle-->
-<!--begin::Vendors Javascript (used for this page only)-->
 <script src="{{ asset('admin/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
@@ -49,8 +61,6 @@
 <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script>
 <script src="{{ asset('admin/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-<!--end::Vendors Javascript-->
-<!--begin::Custom Javascript (used for this page only)-->
 <script src="{{ asset('admin/assets/js/widgets.bundle.js') }}"></script>
 <script src="{{ asset('admin/assets/js/custom/widgets.js') }}"></script>
 <script src="{{ asset('admin/assets/js/custom/apps/chat/chat.js') }}"></script>
@@ -58,10 +68,6 @@
 <script src="{{ asset('admin/assets/js/custom/utilities/modals/create-app.js') }}"></script>
 <script src="{{ asset('admin/assets/js/custom/utilities/modals/new-target.js') }}"></script>
 <script src="{{ asset('admin/assets/js/custom/utilities/modals/users-search.js') }}"></script>
-
-<!--end::Custom Javascript-->
-<!--end::Javascript-->
 </body>
 <!--end::Body-->
-
 </html>

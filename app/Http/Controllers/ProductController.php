@@ -99,6 +99,8 @@ class ProductController extends Controller
         $product->price = $request->input('price');
         $product->labour_charges = $request->input('labour_charges');
         $product->gst_percentage = $request->input('gst_percentage');
+        $product->is_featured = $request->boolean('is_featured');
+        $product->is_top_rated = $request->boolean('is_top_rated');
         $product->save(); // Save product first to get ID
 
         // Store Pricing Details

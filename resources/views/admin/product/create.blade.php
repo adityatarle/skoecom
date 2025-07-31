@@ -89,6 +89,23 @@
                                             You can include text, numbers, and special characters in the description.
                                         </div>
                                     </div>
+                                    <!-- Featured/Top Rated toggles -->
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mt-3">
+                                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="is_featured">
+                                                <i class="fas fa-star me-1"></i> Featured Product
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check form-switch mt-3">
+                                            <input class="form-check-input" type="checkbox" name="is_top_rated" id="is_top_rated" value="1" {{ old('is_top_rated') ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-bold" for="is_top_rated">
+                                                <i class="fas fa-trophy me-1"></i> Top Rated Product
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
