@@ -138,7 +138,7 @@ class ProductCategoryController extends Controller
         }
         
         // Set default values
-        $validated['is_active'] = $request->has('is_active');
+        $validated['is_active'] = $request->boolean('is_active');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
         
         // Validate hierarchy logic
@@ -238,7 +238,7 @@ class ProductCategoryController extends Controller
         }
         
         // Set default values
-        $validated['is_active'] = $request->has('is_active');
+        $validated['is_active'] = $request->boolean('is_active');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
         
         // Validate hierarchy logic
