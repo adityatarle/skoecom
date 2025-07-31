@@ -95,16 +95,16 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin Routes (Protected by Auth and Admin Middleware)
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dash', [HomeController::class, 'index'])->name('dashboard');
 
     // Product Inquiries
-    Route::get('/products/inquiries', [ProductController::class, 'showInquiries'])->name('admin.product.inquiries');
+    Route::get('/products/inquiries', [ProductController::class, 'showInquiries'])->name('product.inquiries');
     Route::delete('/products/inquiries/{productInquiry}', [ProductController::class, 'destroyInquiry'])->name('admin.product.inquiry.destroy');
 
     // Product Management
-    Route::prefix('product')->name('admin.product.')->group(function () {
+    Route::prefix('product')->name('product.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::post('/', [ProductController::class, 'store'])->name('store');
@@ -114,7 +114,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     });
 
     // Category Management
-    Route::prefix('categories')->name('admin.category.')->group(function () {
+    Route::prefix('categories')->name('category.')->group(function () {
         Route::get('/', [ProductCategoryController::class, 'index'])->name('index');
         Route::get('/create', [ProductCategoryController::class, 'create'])->name('create');
         Route::post('/', [ProductCategoryController::class, 'store'])->name('store');
@@ -127,22 +127,32 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     });
     
     // Category AJAX routes
-    Route::get('/categories/get-by-parent', [ProductCategoryController::class, 'getByParent'])->name('admin.category.getByParent');
+    Route::get('/categories/get-by-parent', [ProductCategoryController::class, 'getByParent'])->name('category.getByParent');
     
-    Route::resource('subcategory', SubcategoryController::class)->names('admin.subcategory');
+    Route::resource('subcategory', SubcategoryController::class)->names('subcategory');
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
-    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('admin.reviews.edit');
-    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('admin.reviews.update');
-    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     // Orders Management
-    Route::get('/orders', [OrdersController::class, 'index'])->name('admin.orders.index');
-    Route::get('/orders/{id}', [OrdersController::class, 'show'])->name('admin.orders.show');
-    Route::delete('/orders/{id}', [OrdersController::class, 'destroy'])->name('admin.orders.destroy');
-    Route::post('/orders/{id}/status', [OrdersController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-    Route::get('/orders/export', [OrdersController::class, 'export'])->name('admin.orders.export');
+    Route::get('/orders', [OrdersController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{id}', [OrdersController::class, 'show'])->name('orders.show');
+    Route::delete('/orders/{id}', [OrdersController::class, 'destroy'])->name('orders.destroy');
+    Route::post('/orders/{id}/status', [OrdersController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::get('/orders/export', [OrdersController::class, 'export'])->name('orders.export');
+
+    // Banner Management
+    Route::resource('banner', \App\Http\Controllers\Admin\BannerController::class);
+
+    // Blog Management
+    Route::resource('blog', \App\Http\Controllers\Admin\BlogController::class);
+
+    // Settings (single edit/update)
+    Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
 
 // Admin subcategories helper route
