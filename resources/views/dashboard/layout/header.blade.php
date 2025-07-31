@@ -533,6 +533,22 @@
 
                                     <!-- Content Management Section -->
                                     <div class="menu-category">Content Management</div>
+                                    <div data-kt-menu-trigger="click" class="menu-item {{ request()->routeIs('admin.banner.*') ? 'here' : '' }}">
+                                        <a href="{{ route('admin.banner.index') }}" class="menu-link {{ request()->routeIs('admin.banner.*') ? 'active' : '' }}">
+                                            <span class="menu-icon">
+                                                <i class="fas fa-image"></i>
+                                            </span>
+                                            <span class="menu-title">Banners</span>
+                                        </a>
+                                    </div>
+                                    <div data-kt-menu-trigger="click" class="menu-item {{ request()->routeIs('admin.blog.*') ? 'here' : '' }}">
+                                        <a href="{{ route('admin.blog.index') }}" class="menu-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}">
+                                            <span class="menu-icon">
+                                                <i class="fas fa-blog"></i>
+                                            </span>
+                                            <span class="menu-title">Blogs</span>
+                                        </a>
+                                    </div>
                                     
                                     <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('admin.category.*') ? 'show' : '' }}">
                                         <span class="menu-link">
@@ -791,46 +807,13 @@
 
                                     <!-- Settings Section -->
                                     <div class="menu-category">Settings</div>
-
-                                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-                                        <span class="menu-link">
+                                    <div data-kt-menu-trigger="click" class="menu-item {{ request()->routeIs('admin.settings.*') ? 'here' : '' }}">
+                                        <a href="{{ route('admin.settings.edit') }}" class="menu-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                                             <span class="menu-icon">
-                                                <i class="ki-duotone ki-gear fs-2">
-                                                    <span class="path1"></span>
-                                                    <span class="path2"></span>
-                                                    <span class="path3"></span>
-                                                    <span class="path4"></span>
-                                                </i>
+                                                <i class="fas fa-cog"></i>
                                             </span>
                                             <span class="menu-title">Settings</span>
-                                            <span class="menu-arrow"></span>
-                                        </span>
-                                        <div class="menu-sub menu-sub-accordion menu-active-bg">
-                                            <div class="menu-item">
-                                                <a class="menu-link" href="#">
-                                                    <span class="menu-bullet">
-                                                        <span class="bullet bullet-dot"></span>
-                                                    </span>
-                                                    <span class="menu-title">General Settings</span>
-                                                </a>
-                                            </div>
-                                            <div class="menu-item">
-                                                <a class="menu-link" href="#">
-                                                    <span class="menu-bullet">
-                                                        <span class="bullet bullet-dot"></span>
-                                                    </span>
-                                                    <span class="menu-title">Payment Settings</span>
-                                                </a>
-                                            </div>
-                                            <div class="menu-item">
-                                                <a class="menu-link" href="#">
-                                                    <span class="menu-bullet">
-                                                        <span class="bullet bullet-dot"></span>
-                                                    </span>
-                                                    <span class="menu-title">Email Settings</span>
-                                                </a>
-                                            </div>
-                                        </div>
+                                        </a>
                                     </div>
 
                                 </div>
