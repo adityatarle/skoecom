@@ -378,7 +378,7 @@
 ============================================ -->
 
 <!-- Plugins JS -->
-<script src="{{ asset('assets/js/vendor/jquery-3.4.1.min.js') }}"></script>
+<!-- jQuery is already loaded in header -->
 <script src="{{ asset('assets/js/popper.js') }}"></script>
 <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/js/plugins.js') }}"></script>

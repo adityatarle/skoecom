@@ -24,6 +24,9 @@
     <!--modernizr min js here-->
     <script src="{{ asset('assets/js/vendor/modernizr-3.7.1.min.js') }}"></script>
 
+    <!-- Load jQuery first to fix $ is not defined error -->
+    <script src="{{ asset('assets/js/vendor/jquery-3.4.1.min.js') }}"></script>
+
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
