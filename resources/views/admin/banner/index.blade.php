@@ -1,45 +1,103 @@
-@include('dashboard.layout.header')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Homepage Banners</h2>
-        <a href="{{ route('admin.banner.create') }}" class="btn btn-success"><i class="fas fa-plus me-1"></i> Add Banner</a>
-    </div>
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Subtitle</th>
-                        <th>Button</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($banners as $banner)
-                        <tr>
-                            <td><img src="{{ asset($banner->image) }}" alt="Banner" style="width:120px;max-height:60px;object-fit:cover;"></td>
-                            <td>{{ $banner->title }}</td>
-                            <td>{{ $banner->subtitle }}</td>
-                            <td>{{ $banner->button_text }}</td>
-                            <td>
-                                <a href="{{ route('admin.banner.edit', $banner) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                                <form action="{{ route('admin.banner.destroy', $banner) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this banner?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="text-center">No banners found.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
+@extends('dashboard.layout.app')
+
+@section('content')
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+    <div class="container-xxl" id="kt_content_container">
+        <div class="card">
+            <div class="card-header border-0 pt-6">
+                <div class="card-title">
+                    <h2>Banner Management</h2>
+                </div>
+                <div class="card-toolbar">
+                    <a href="{{ route('admin.banner.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add New Banner
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Image</th>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Subtitle</th>
+                                <th>Button</th>
+                                <th>Status</th>
+                                <th>Order</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($banners as $banner)
+                            <tr>
+                                <td>
+                                    <img src="{{ asset($banner->image) }}" alt="{{ $banner->title }}" 
+                                         style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px;">
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ $banner->type == 'slider' ? 'primary' : ($banner->type == 'fullwidth' ? 'success' : 'info') }}">
+                                        {{ ucfirst($banner->type) }}
+                                    </span>
+                                </td>
+                                <td>{{ $banner->title ?? 'N/A' }}</td>
+                                <td>{{ $banner->subtitle ?? 'N/A' }}</td>
+                                <td>
+                                    @if($banner->button_text)
+                                        <span class="badge bg-secondary">{{ $banner->button_text }}</span>
+                                    @else
+                                        <span class="text-muted">No button</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <form action="{{ route('admin.banner.toggle-status', $banner) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm {{ $banner->is_active ? 'btn-success' : 'btn-secondary' }}">
+                                            {{ $banner->is_active ? 'Active' : 'Inactive' }}
+                                        </button>
+                                    </form>
+                                </td>
+                                <td>{{ $banner->sort_order }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.banner.edit', $banner) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.banner.destroy', $banner) }}" method="POST" 
+                                              style="display: inline;" onsubmit="return confirm('Are you sure?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-image fa-3x mb-3"></i>
+                                        <p>No banners found. Create your first banner!</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-@include('dashboard.layout.footer')
+@endsection
