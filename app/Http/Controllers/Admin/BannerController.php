@@ -39,10 +39,21 @@ class BannerController extends Controller
         
         // Handle image upload
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/banners', $imageName);
-            $data['image'] = 'storage/banners/' . $imageName;
+            try {
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                
+                // Store in public disk
+                $path = $image->storeAs('banners', $imageName, 'public');
+                $data['image'] = 'storage/' . $path;
+                
+                // Ensure the file exists
+                if (!Storage::disk('public')->exists('banners/' . $imageName)) {
+                    throw new \Exception('Failed to store image file');
+                }
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()])->withInput();
+            }
         }
 
         $data['is_active'] = $request->boolean('is_active');
@@ -77,15 +88,29 @@ class BannerController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($banner->image && Storage::exists(str_replace('storage/', 'public/', $banner->image))) {
-                Storage::delete(str_replace('storage/', 'public/', $banner->image));
+            try {
+                // Delete old image
+                if ($banner->image) {
+                    $oldPath = str_replace('storage/', '', $banner->image);
+                    if (Storage::disk('public')->exists($oldPath)) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
+                }
+                
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                
+                // Store in public disk
+                $path = $image->storeAs('banners', $imageName, 'public');
+                $data['image'] = 'storage/' . $path;
+                
+                // Ensure the file exists
+                if (!Storage::disk('public')->exists('banners/' . $imageName)) {
+                    throw new \Exception('Failed to store image file');
+                }
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Failed to upload image: ' . $e->getMessage()])->withInput();
             }
-            
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/banners', $imageName);
-            $data['image'] = 'storage/banners/' . $imageName;
         }
 
         $data['is_active'] = $request->boolean('is_active');
@@ -99,8 +124,11 @@ class BannerController extends Controller
     public function destroy(Banner $banner)
     {
         // Delete image file
-        if ($banner->image && Storage::exists(str_replace('storage/', 'public/', $banner->image))) {
-            Storage::delete(str_replace('storage/', 'public/', $banner->image));
+        if ($banner->image) {
+            $path = str_replace('storage/', '', $banner->image);
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
         }
 
         $banner->delete();
