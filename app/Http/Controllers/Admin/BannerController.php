@@ -1,70 +1,119 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Banner;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
     public function index()
     {
-        $banners = Banner::all();
+        $banners = Banner::orderBy('type')->orderBy('sort_order')->get();
         return view('admin.banner.index', compact('banners'));
     }
+
     public function create()
     {
         return view('admin.banner.create');
     }
+
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
+        $request->validate([
+            'type' => 'required|in:slider,fullwidth,newsletter',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
-            'button_text' => 'nullable|string|max:255',
-            'button_url' => 'nullable|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'description' => 'nullable|string',
+            'button_text' => 'nullable|string|max:100',
+            'button_url' => 'nullable|url|max:255',
+            'price_text' => 'nullable|string|max:100',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_active' => 'boolean'
         ]);
+
+        $data = $request->all();
+        
+        // Handle image upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/banners'), $imageName);
-            $data['image'] = 'images/banners/' . $imageName;
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/banners', $imageName);
+            $data['image'] = 'storage/banners/' . $imageName;
         }
+
+        $data['is_active'] = $request->boolean('is_active');
+
         Banner::create($data);
-        return redirect()->route('admin.banner.index')->with('success', 'Banner created successfully!');
+
+        return redirect()->route('admin.banner.index')
+            ->with('success', 'Banner created successfully.');
     }
+
     public function edit(Banner $banner)
     {
         return view('admin.banner.edit', compact('banner'));
     }
+
     public function update(Request $request, Banner $banner)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
+        $request->validate([
+            'type' => 'required|in:slider,fullwidth,newsletter',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
-            'button_text' => 'nullable|string|max:255',
-            'button_url' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'description' => 'nullable|string',
+            'button_text' => 'nullable|string|max:100',
+            'button_url' => 'nullable|url|max:255',
+            'price_text' => 'nullable|string|max:100',
+            'sort_order' => 'nullable|integer|min:0',
+            'is_active' => 'boolean'
         ]);
+
+        $data = $request->all();
+
+        // Handle image upload
         if ($request->hasFile('image')) {
-            if ($banner->image && file_exists(public_path($banner->image))) {
-                unlink(public_path($banner->image));
+            // Delete old image
+            if ($banner->image && Storage::exists(str_replace('storage/', 'public/', $banner->image))) {
+                Storage::delete(str_replace('storage/', 'public/', $banner->image));
             }
+            
             $image = $request->file('image');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/banners'), $imageName);
-            $data['image'] = 'images/banners/' . $imageName;
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/banners', $imageName);
+            $data['image'] = 'storage/banners/' . $imageName;
         }
+
+        $data['is_active'] = $request->boolean('is_active');
+
         $banner->update($data);
-        return redirect()->route('admin.banner.index')->with('success', 'Banner updated successfully!');
+
+        return redirect()->route('admin.banner.index')
+            ->with('success', 'Banner updated successfully.');
     }
+
     public function destroy(Banner $banner)
     {
-        if ($banner->image && file_exists(public_path($banner->image))) {
-            unlink(public_path($banner->image));
+        // Delete image file
+        if ($banner->image && Storage::exists(str_replace('storage/', 'public/', $banner->image))) {
+            Storage::delete(str_replace('storage/', 'public/', $banner->image));
         }
+
         $banner->delete();
-        return redirect()->route('admin.banner.index')->with('success', 'Banner deleted successfully!');
+
+        return redirect()->route('admin.banner.index')
+            ->with('success', 'Banner deleted successfully.');
+    }
+
+    public function toggleStatus(Banner $banner)
+    {
+        $banner->update(['is_active' => !$banner->is_active]);
+        
+        return redirect()->route('admin.banner.index')
+            ->with('success', 'Banner status updated successfully.');
     }
 }

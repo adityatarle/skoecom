@@ -1,5 +1,24 @@
 @include('layout.header')
 
+@php
+use App\Models\Banner;
+use App\Models\Setting;
+use App\Models\Blog;
+
+// Get banners by type
+$sliderBanners = Banner::active()->slider()->orderBy('sort_order')->get();
+$fullwidthBanner = Banner::active()->fullwidth()->first();
+$newsletterSettings = [
+    'title' => Setting::get('newsletter_title', 'Our Newsletter'),
+    'description' => Setting::get('newsletter_description', 'Get E-mail updates about our latest shop and special offers.'),
+    'placeholder' => Setting::get('newsletter_placeholder', 'Email address...'),
+    'button_text' => Setting::get('newsletter_button_text', 'Subscribe')
+];
+
+// Get latest blogs for the commented section
+$latestBlogs = Blog::latest()->take(4)->get();
+@endphp
+
 <style>
     @keyframes moveRight {
         0% {
@@ -57,6 +76,35 @@
 </style>
 
 <!--slider area start-->
+@if($sliderBanners->count() > 0)
+<div class="slider_area home_slider_three owl-carousel">
+    @foreach($sliderBanners as $banner)
+    <div class="single_slider" style="background-image: url('{{ asset($banner->image) }}');">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="slider_content">
+                        @if($banner->subtitle)
+                            <p>{{ $banner->subtitle }}</p>
+                        @endif
+                        @if($banner->title)
+                            <h1>{{ $banner->title }}</h1>
+                        @endif
+                        @if($banner->price_text)
+                            <p class="slider_price">{{ $banner->price_text }}</p>
+                        @endif
+                        @if($banner->button_text && $banner->button_url)
+                            <a class="button" href="{{ $banner->button_url }}">{{ $banner->button_text }}</a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+@else
+<!-- Default slider if no banners -->
 <div class="slider_area home_slider_three owl-carousel">
     <div class="single_slider" style="background-image: url('assets/img/slider/banner.jpg');">
         <div class="container">
@@ -72,21 +120,8 @@
             </div>
         </div>
     </div>
-    <div class="single_slider" style="background-image: url('assets/img/slider/slider5.jpg');">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <div class="slider_content">
-                        <p class="text-dark">exclusive offer -10% off this week</p>
-                        <h1>Rings For Women</h1>
-                        <p class="slider_price">starting at <span class="text-dark">$2,199.00</span></p>
-                        <a class="button bg-dark" href="shop.html">Shop Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+@endif
 <!--slider area end-->
 
 <!-- Benefits Section Start -->
@@ -186,18 +221,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- new card code start -->
-                                <!-- <div class="col">
-                                    <div class="card h-100">
-                                        <img src="{{ $product->images->first() ? asset($product->images->first()->image_path) : asset('images/no-image.png') }}" alt="{{ $product->name }}" class="card-img-top img-fluid">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ $product->name }}</h5>
-                                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- new card code end -->
                                 @endforeach
                             </div>
 
@@ -251,6 +274,31 @@
 <!--product section area end-->
 
 <!--banner fullwidth start-->
+@if($fullwidthBanner)
+<section class="banner_fullwidth position-relative overflow-hidden mb-5 mb-md-5">
+    <div class="container">
+        <div class="row align-items-center h-100">
+            <div class="col-12">
+                <div class="banner_text text-center mx-auto rounded-3 shadow-sm">
+                    @if($fullwidthBanner->subtitle)
+                        <p class="text-uppercase mb-2 fw-light ls-2 text-dusty-rose">{{ $fullwidthBanner->subtitle }}</p>
+                    @endif
+                    @if($fullwidthBanner->title)
+                        <h2 class="display-4 text-capitalize mb-3 fw-bold text-deep-brown">{{ $fullwidthBanner->title }}</h2>
+                    @endif
+                    @if($fullwidthBanner->description)
+                        <span class="d-block mb-4 fst-italic text-warm-gray">{{ $fullwidthBanner->description }}</span>
+                    @endif
+                    @if($fullwidthBanner->button_text && $fullwidthBanner->button_url)
+                        <a href="{{ $fullwidthBanner->button_url }}" class="btn btn-outline-soft-gold text-uppercase fw-medium px-5 py-2 rounded-1 mt-4">{{ $fullwidthBanner->button_text }}</a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@else
+<!-- Default fullwidth banner if none exists -->
 <section class="banner_fullwidth position-relative overflow-hidden mb-5 mb-md-5">
     <div class="container">
         <div class="row align-items-center h-100">
@@ -265,116 +313,58 @@
         </div>
     </div>
 </section>
+@endif
 <!--banner area end-->
 
 <!--blog section area start-->
-<!-- <section class="blog_section" id="sk-blog">
+@if($latestBlogs->count() > 0)
+<section class="blog_section" id="sk-blog">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <div class="section_title">
-                    <h2>Blog</h2>
+                    <h2>Latest Blog Posts</h2>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="blog_wrapper blog_column3 owl-carousel">
+                @foreach($latestBlogs as $blog)
                 <div class="col-lg-4">
                     <div class="single_blog">
                         <div class="blog_thumb">
-                            <a href="blog-details.html"><img src="assets/img/blog/12.jpg" alt="Blog image post"></a>
+                            <a href="{{ route('blog.show', $blog->slug) }}">
+                                @if($blog->image)
+                                    <img src="{{ asset($blog->image) }}" alt="{{ $blog->title }}">
+                                @else
+                                    <img src="assets/img/blog/12.jpg" alt="{{ $blog->title }}">
+                                @endif
+                            </a>
                         </div>
                         <div class="blog_content">
-                            <h3><a href="blog-details.html">Blog Image Post</a></h3>
+                            <h3><a href="{{ route('blog.show', $blog->slug) }}">{{ $blog->title }}</a></h3>
                             <div class="author_name">
                                 <p>
                                     <span>by</span>
                                     <span class="themes">admin</span>
-                                    / 30 Oct 2018
+                                    / {{ $blog->created_at->format('d M Y') }}
                                 </p>
                             </div>
                             <div class="post_desc">
-                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
+                                <p>{{ Str::limit(strip_tags($blog->content), 100) }}</p>
                             </div>
                             <div class="read_more">
-                                <a href="blog-details.html">Read More</a>
+                                <a href="{{ route('blog.show', $blog->slug) }}">Read More</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="single_blog">
-                        <div class="blog_thumb">
-                            <a href="blog-details.html"><img src="assets/img/blog/16.jpg" alt="Post with Gallery"></a>
-                        </div>
-                        <div class="blog_content">
-                            <h3><a href="blog-details.html">Post with Gallery</a></h3>
-                            <div class="author_name">
-                                <p>
-                                    <span>by</span>
-                                    <span class="themes">admin</span>
-                                    / 30 Oct 2018
-                                </p>
-                            </div>
-                            <div class="post_desc">
-                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
-                            </div>
-                            <div class="read_more">
-                                <a href="blog-details.html">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="single_blog">
-                        <div class="blog_thumb">
-                            <a href="blog-details.html"><img src="assets/img/blog/24.jpeg" alt="Post with Video"></a>
-                        </div>
-                        <div class="blog_content">
-                            <h3><a href="blog-details.html">Post with Video</a></h3>
-                            <div class="author_name">
-                                <p>
-                                    <span>by</span>
-                                    <span class="themes">admin</span>
-                                    / 30 Oct 2018
-                                </p>
-                            </div>
-                            <div class="post_desc">
-                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
-                            </div>
-                            <div class="read_more">
-                                <a href="blog-details.html">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="single_blog">
-                        <div class="blog_thumb">
-                            <a href="blog-details.html"><img src="assets/img/blog/33.jpeg" alt="Maecenas ultricies"></a>
-                        </div>
-                        <div class="blog_content">
-                            <h3><a href="blog-details.html">Maecenas ultricies</a></h3>
-                            <div class="author_name">
-                                <p>
-                                    <span>by</span>
-                                    <span class="themes">admin</span>
-                                    / 30 Oct 2018
-                                </p>
-                            </div>
-                            <div class="post_desc">
-                                <p>Donec vitae hendrerit arcu, sit amet faucibus nisl. Cras pretium arcu ex.</p>
-                            </div>
-                            <div class="read_more">
-                                <a href="blog-details.html">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
-</section> -->
+</section>
+@endif
 <!--blog section area end-->
 
 <!--Newsletter area start-->
@@ -383,12 +373,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="newsletter_content">
-                    <h2>Our Newsletter</h2>
-                    <p>Get E-mail updates about our latest shop and special offers.</p>
+                    <h2>{{ $newsletterSettings['title'] }}</h2>
+                    <p>{{ $newsletterSettings['description'] }}</p>
                     <div class="subscribe_form">
                         <form id="mc-form" class="mc-form footer-newsletter">
-                            <input id="mc-email" type="email" autocomplete="off" placeholder="Email address..." />
-                            <button id="mc-submit" type="submit">Subscribe</button>
+                            <input id="mc-email" type="email" autocomplete="off" placeholder="{{ $newsletterSettings['placeholder'] }}" />
+                            <button id="mc-submit" type="submit">{{ $newsletterSettings['button_text'] }}</button>
                         </form>
                         <!-- mailchimp-alerts Start -->
                         <div class="mailchimp-alerts text-center">

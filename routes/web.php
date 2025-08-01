@@ -146,6 +146,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Banner Management
     Route::resource('banner', \App\Http\Controllers\Admin\BannerController::class);
+    Route::post('banner/{banner}/toggle-status', [\App\Http\Controllers\Admin\BannerController::class, 'toggleStatus'])->name('banner.toggle-status');
 
     // Blog Management
     Route::resource('blog', \App\Http\Controllers\Admin\BlogController::class);
@@ -176,3 +177,13 @@ Route::get('/debug/categories', function() {
         ], 500);
     }
 })->name('debug.categories');
+
+// Public Blog Routes
+Route::get('/blog', function() {
+    $blogs = \App\Models\Blog::latest()->paginate(12);
+    return view('blog.index', compact('blogs'));
+})->name('blog.index');
+
+Route::get('/blog/{blog:slug}', function(\App\Models\Blog $blog) {
+    return view('blog.show', compact('blog'));
+})->name('blog.show');
